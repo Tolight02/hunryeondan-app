@@ -1,0 +1,17 @@
+{
+  "name": "hunryeondan-app",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "공군교육사령부 훈련단 수료 D-day + 오늘 식단 (가족용, 로그인 불필요)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@pmh-only/welplan2-welstory-plus": "latest",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.onrender.hunryeondan_app.twa",
+      "sha256_cert_fingerprints": ["65:87:51:DC:EB:7B:2B:98:F7:89:7D:DB:FF:AE:B0:27:0D:44:A5:F2:34:B6:B8:FD:01:F7:8D:AE:2A:F0:4C:7E"]
+    }
+  }
+]

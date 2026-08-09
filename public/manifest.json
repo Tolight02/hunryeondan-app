@@ -1,0 +1,12 @@
+{
+  "name": "공군 식단 앱",
+  "short_name": "공군식단",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#b5651d",
+  "icons": [
+    { "src": "/assets/icon-app.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-app.png", "sizes": "1024x1024", "type": "image/png", "purpose": "maskable" }
+  ]
+}

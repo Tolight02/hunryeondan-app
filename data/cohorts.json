@@ -1,0 +1,66 @@
+{
+  "_설명": "기수별 입영일자/수료일자. 병무청 '2026년도 공군 병 연간 모집일정(공지용)' PDF 기준으로 875~886기 입력 완료 (2026-07-29 확인). 병무청이 새 일정을 공지하면 이 배열에 같은 형식으로 줄만 추가하면 됩니다. 여기 없는 기수는 자동으로 입영일+32일로 추정합니다.",
+  "_출처": "병무청 누리집 > 군지원(입영신청)안내 > 이달의 모집계획 > 공군 모집계획 - 2026년도 공군 병 연간 모집일정(공지용)_수정",
+  "cohorts": [
+    {
+      "gigsu": 875,
+      "enlistDate": "2026-01-19",
+      "completionDate": "2026-02-20"
+    },
+    {
+      "gigsu": 876,
+      "enlistDate": "2026-02-23",
+      "completionDate": "2026-03-27"
+    },
+    {
+      "gigsu": 877,
+      "enlistDate": "2026-03-23",
+      "completionDate": "2026-04-24"
+    },
+    {
+      "gigsu": 878,
+      "enlistDate": "2026-04-20",
+      "completionDate": "2026-05-22"
+    },
+    {
+      "gigsu": 879,
+      "enlistDate": "2026-05-18",
+      "completionDate": "2026-06-19"
+    },
+    {
+      "gigsu": 880,
+      "enlistDate": "2026-06-22",
+      "completionDate": "2026-07-24"
+    },
+    {
+      "gigsu": 881,
+      "enlistDate": "2026-07-27",
+      "completionDate": "2026-08-28"
+    },
+    {
+      "gigsu": 882,
+      "enlistDate": "2026-08-31",
+      "completionDate": "2026-10-02"
+    },
+    {
+      "gigsu": 883,
+      "enlistDate": "2026-09-28",
+      "completionDate": "2026-10-30"
+    },
+    {
+      "gigsu": 884,
+      "enlistDate": "2026-10-26",
+      "completionDate": "2026-11-27"
+    },
+    {
+      "gigsu": 885,
+      "enlistDate": "2026-11-23",
+      "completionDate": "2026-12-24"
+    },
+    {
+      "gigsu": 886,
+      "enlistDate": "2026-12-21",
+      "completionDate": "2027-01-22"
+    }
+  ]
+}

@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<title>공군 식단 앱</title>
+<link rel="manifest" href="/manifest.json" />
+<link rel="icon" href="/assets/icon-app.png" type="image/png" />
+<link rel="apple-touch-icon" href="/assets/icon-app.png" />
+<meta name="theme-color" content="#b5651d" />
+<style>
+  :root {
+    --bg: #faf8f4;
+    --card: #ffffff;
+    --line: #ece6da;
+    --text: #292520;
+    --muted: #8a8477;
+    --accent: #b5651d;
+    --accent-soft: #f3e3cf;
+    --accent-soft-2: #f8ede0;
+    --shadow: 0 2px 14px rgba(60, 45, 20, 0.07);
+    --shadow-lg: 0 12px 32px rgba(40, 30, 10, 0.16);
+    --radius-lg: 24px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  .screen { max-width: 480px; margin: 0 auto; padding: 28px 20px 64px; }
+
+  /* ---------- 설정 화면 ---------- */
+  #setupScreen h1, #categoryScreen h1 {
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+    margin: 44px 0 8px;
+    letter-spacing: -0.01em;
+  }
+  #setupScreen .desc, #categoryScreen .desc {
+    text-align: center;
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+
+  /* ---------- 우측 상단 메뉴 ---------- */
+  #topMenuBtn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 30;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: var(--card);
+    color: var(--text);
+    font-size: 18px;
+    box-shadow: var(--shadow);
+  }
+  .top-menu-dropdown {
+    display: none;
+    position: fixed;
+    top: 64px;
+    right: 16px;
+    z-index: 30;
+    background: var(--card);
+    border-radius: var(--radius-md);
+    padding: 8px;
+    min-width: 170px;
+    box-shadow: var(--shadow-lg);
+  }
+  .top-menu-dropdown.open { display: block; }
+  .top-menu-dropdown a,
+  .top-menu-dropdown button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    background: none;
+    border: none;
+  }
+  .top-menu-dropdown a:active,
+  .top-menu-dropdown button:active { background: var(--accent-soft-2); }
+
+  /* ---------- 신분 선택 화면 ---------- */
+  .category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .category-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--card);
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    font-size: 17px;
+    font-weight: 700;
+    text-align: left;
+    color: var(--text);
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .category-btn:active {
+    transform: scale(0.98);
+    background: var(--accent-soft-2);
+  }
+  .category-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--accent-soft);
+    flex-shrink: 0;
+  }
+  .back-link {
+    display: table;
+    margin: 22px auto 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 16px;
+  }
+
+  .tabs {
+    display: flex;
+    background: var(--accent-soft-2);
+    border-radius: var(--radius-md);
+    padding: 5px;
+    margin-bottom: 20px;
+    gap: 4px;
+  }
+  .tabs button {
+    flex: 1;
+    padding: 13px 6px;
+    border: none;
+    background: transparent;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--muted);
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .tabs button.active {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 4px 12px rgba(181, 101, 29, 0.35);
+  }
+  .field {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .field label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .field select, .field input[type="date"] {
+    width: 100%;
+    font-size: 19px;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+  }
+  #confirmBtn {
+    width: 100%;
+    padding: 18px;
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-md);
+    box-shadow: 0 6px 18px rgba(181, 101, 29, 0.3);
+  }
+  #confirmBtn:active { transform: scale(0.98); }
+  #confirmBtn:disabled { opacity: 0.6; }
+  #setupError {
+    color: #c0392b;
+    text-align: center;
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 20px;
+  }
+
+  /* ---------- 결과 화면 ---------- */
+  #resultScreen { display: none; }
+
+  .mini-dday {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--accent);
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 12px;
+    margin: -28px -20px 18px;
+    letter-spacing: 0.01em;
+  }
+
+  .top-bar {
+    text-align: center;
+    margin-bottom: 2px;
+    padding-top: 4px;
+  }
+  .top-bar .cohort-label {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .top-bar .weather-chip {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .progress-card {
+    background: var(--card);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    text-align: center;
+    margin: 10px 0 18px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+  }
+  .progress-card .progress-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    min-width: 78px;
+  }
+  .dday {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .dday-sub { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 2px; white-space: nowrap; }
+  .progress-card .progress-bar-wrap { flex: 1; }
+  .bar-track {
+    width: 100%;
+    height: 12px;
+    background: var(--accent-soft-2);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.6s ease;
+  }
+  .percent-label { margin-top: 6px; font-size: 13px; font-weight: 800; text-align: right; }
+  .estimate-note {
+    display: none; /* 화면을 더 차지하지 않도록 기본적으로는 숨기고, 카드를 누르면 펼쳐짐 */
+    margin: -8px 0 18px;
+    padding: 0 4px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .estimate-note.open { display: block; }
+
+  .menu-section h2 {
+    font-size: 19px;
+    font-weight: 800;
+    margin: 4px 0 14px;
+  }
+  .date-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border-radius: var(--radius-md);
+    padding: 10px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .date-row input[type="date"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .date-row .date-display {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 12px 8px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--text);
+  }
+  .date-row .date-display .cal-icon { font-size: 17px; }
+  .date-row button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft-2);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+    min-height: 44px;
+  }
+  .date-row .arrow-btn {
+    padding: 10px 16px;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .meal-block { margin-bottom: 20px; }
+  .meal-block h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 0 0 10px;
+    padding-left: 2px;
+  }
+  .menu-card {
+    background: var(--card);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .menu-card:active { background: var(--accent-soft-2); }
+  .menu-card .thumb {
+    width: 58px; height: 58px; border-radius: var(--radius-sm); object-fit: cover;
+    background: var(--accent-soft); flex-shrink: 0;
+  }
+  .menu-card .info { flex: 1; min-width: 0; }
+  .menu-card .name { font-size: 17px; font-weight: 700; }
+  .menu-card .kcal { color: var(--muted); font-size: 13px; font-weight: 600; margin-top: 4px; }
+  .menu-card .detail-list {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .menu-card .tap-hint { font-size: 12px; color: var(--accent); font-weight: 700; margin-top: 8px; }
+  #menuStatus { text-align: center; color: var(--muted); padding: 24px; font-size: 14px; }
+
+  .brand-heading {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    margin: 10px 0 6px;
+    letter-spacing: 0.02em;
+  }
+  .convenience-card { padding-left: 18px; }
+
+  /* ---------- 영양성분 모달 ---------- */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(30, 22, 10, 0.5);
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    background: var(--card);
+    width: 100%;
+    max-width: 480px;
+    border-radius: 28px 28px 0 0;
+    padding: 28px 22px 34px;
+    max-height: 82vh;
+    overflow-y: auto;
+  }
+  .modal-sheet img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    background: var(--accent-soft);
+  }
+  .modal-sheet h3 { font-size: 20px; font-weight: 800; margin: 0 0 14px; }
+  .nutri-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+  }
+  .modal-sheet a, .top-menu-dropdown a {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .nutri-row .k { color: var(--muted); font-weight: 500; }
+  .nutri-row .v { font-weight: 700; text-align: right; }
+
+  /* 구성 메뉴: 진하고 크게 (강조) */
+  .comp-rows .nutri-row {
+    padding: 13px 0;
+  }
+  .comp-rows .nutri-row .k {
+    color: var(--text);
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .comp-rows .nutri-row .v {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .comp-rows .nutri-row:last-child {
+    border-bottom: none;
+  }
+
+  /* 영양성분: 작고 흐리게 (참고용) */
+  .nutri-rows-only {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 2px dashed var(--line);
+  }
+  .nutri-rows-only .section-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .nutri-rows-only .nutri-row {
+    padding: 7px 0;
+    font-size: 13px;
+  }
+  .nutri-rows-only .nutri-row .k,
+  .nutri-rows-only .nutri-row .v {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .brand-item-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1.5px solid var(--line);
+  }
+  .brand-item-name:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+  .modal-close {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--accent-soft-2);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .modal-close:active { background: var(--accent-soft); }
+
+  .reset-link {
+    display: table;
+    margin: 32px auto 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 16px;
+  }
+</style>
+</head>
+<body>
+
+<button id="topMenuBtn" aria-label="메뉴">☰</button>
+<div id="topMenuDropdown" class="top-menu-dropdown">
+  <button id="bugReportBtn" type="button">🐛 버그 제보</button>
+  <button id="licenseOpenBtn" type="button">📄 라이선스</button>
+</div>
+
+<div class="modal-overlay" id="licenseModal">
+  <div class="modal-sheet">
+    <h3>라이선스 &amp; 도움 주신 분들</h3>
+    <div class="nutri-row"><span class="k">식단 정보</span><span class="v">삼성웰스토리</span></div>
+    <div class="nutri-row"><span class="k">어플 로고</span><span class="v"><a href="https://afplay2.tistory.com/74" target="_blank" rel="noopener">afplay2.tistory.com</a></span></div>
+    <div class="nutri-row"><span class="k">캐릭터 일러스트</span><span class="v"><a href="http://www.afzine.co.kr/20190719_162442/" target="_blank" rel="noopener">afzine.co.kr</a></span></div>
+
+    <div class="brand-item-name" style="margin-top:20px;">도움 주신 분들</div>
+    <div class="nutri-row"><span class="k">우유볶음</span><span class="v">공군 832기</span></div>
+    <div class="nutri-row"><span class="k">행포</span><span class="v">공군 842기</span></div>
+    <div class="nutri-row"><span class="k">LWB</span><span class="v">공군 881기</span></div>
+    <div class="nutri-row" id="easterEggRow" style="cursor:pointer;">
+      <span class="k">그리고 한 명 더...? 👀</span><span class="v">눌러보세요</span>
+    </div>
+    <div id="easterEggReveal" style="display:none; padding-top:10px; font-size:13px; color:var(--muted); line-height:1.7;">
+      진짜 1등 공신은 지금 이 순간도 국가와 국민을 위해 일하고 있는 우리 군 장병들과,
+      사랑하는 아들/딸을 기다리고 계신 여러분입니다 🫡
+    </div>
+
+    <button class="modal-close" id="licenseClose">닫기</button>
+  </div>
+</div>
+
+<div class="screen" id="categoryScreen">
+  <h1>어떤 신분이신가요?</h1>
+  <div class="desc">신분에 따라 보이는 식단이 달라요</div>
+  <div class="category-list">
+    <button class="category-btn" data-category="trainee">
+      <img src="/assets/trainee.png" alt="" class="category-avatar" />
+      <span>훈련병</span>
+    </button>
+    <button class="category-btn" data-category="instructor">
+      <img src="/assets/instructor.png" alt="" class="category-avatar" />
+      <span>조교</span>
+    </button>
+    <button class="category-btn" data-category="specialty">
+      <img src="/assets/specialty.png" alt="" class="category-avatar" />
+      <span>특기학교 및 진주 자대</span>
+    </button>
+    <button class="category-btn" data-category="candidate">
+      <img src="/assets/candidate.png" alt="" class="category-avatar" />
+      <span>부사관 및 장교 후보생</span>
+    </button>
+  </div>
+</div>
+
+<div class="screen" id="setupScreen" style="display:none;">
+  <h1>수료까지 며칠 남았을까요?</h1>
+  <div class="desc">기수 또는 입소일 중 <b>하나만</b> 넣으면 돼요</div>
+
+  <div class="tabs">
+    <button id="tabGigsu" class="active">기수로 찾기</button>
+    <button id="tabDate">입소일로 찾기</button>
+    <button id="tabUnknown">모르겠어요</button>
+  </div>
+
+  <div class="field" id="gigsuField">
+    <label>기수</label>
+    <select id="gigsuSelect">
+      <option value="">불러오는 중...</option>
+    </select>
+  </div>
+
+  <div class="field" id="dateField" style="display:none;">
+    <label>입소(입대)한 날짜</label>
+    <input type="date" id="dateInput" />
+  </div>
+
+  <div class="field" id="unknownField" style="display:none;">
+    기수나 입소일을 몰라도 괜찮아요. 수료일 계산 없이 바로 식단만 보여드릴게요.
+  </div>
+
+  <button id="confirmBtn">확인</button>
+  <div id="setupError"></div>
+  <a href="#" class="back-link" id="backToCategoryLink">← 신분 다시 선택</a>
+</div>
+
+<div class="screen" id="resultScreen">
+  <div class="mini-dday" id="miniDday" style="display:none;">-</div>
+
+  <div class="top-bar">
+    <div class="cohort-label" id="cohortLabel"></div>
+    <div class="weather-chip" id="weatherChip"></div>
+  </div>
+
+  <div class="progress-card" id="progressCard" style="display:none;">
+    <div class="progress-main">
+      <div class="dday" id="ddayText">-</div>
+      <div class="dday-sub">수료까지</div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+      <div class="percent-label" id="percentLabel">0%</div>
+    </div>
+  </div>
+  <div class="estimate-note" id="estimateNote"></div>
+
+  <div class="menu-section">
+    <h2>오늘 식단</h2>
+    <div class="date-row">
+      <button id="prevDayBtn" class="arrow-btn" aria-label="이전 날짜">‹</button>
+      <button id="dateDisplayBtn" class="date-display" type="button">
+        <span class="cal-icon">📅</span><span id="dateLabel">-</span>
+      </button>
+      <input type="date" id="menuDateInput" />
+      <button id="nextDayBtn" class="arrow-btn" aria-label="다음 날짜">›</button>
+      <button id="todayBtn">오늘</button>
+    </div>
+    <div id="menuArea"></div>
+    <div id="menuStatus"></div>
+  </div>
+
+  <a href="#" class="reset-link" id="resetLink">처음부터 다시 설정하기</a>
+</div>
+
+<div class="modal-overlay" id="nutriModal">
+  <div class="modal-sheet">
+    <img id="nutriImg" style="display:none;" />
+    <h3 id="nutriTitle">메뉴</h3>
+    <div id="nutriRows"></div>
+    <button class="modal-close" id="nutriClose">닫기</button>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const STORAGE_KEY = 'hunryeondan_setting';
+
+// toISOString()은 UTC 기준이라 한국(UTC+9)에서는 자정 근처에 날짜가 하루 밀리는 버그가 생김.
+// 항상 "로컬 기준" 날짜 문자열을 만들어주는 안전한 헬퍼.
+function toLocalISODate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+const CATEGORY_LABELS = {
+  trainee: '훈련병',
+  instructor: '조교',
+  specialty: '특기학교 및 진주 자대',
+  candidate: '부사관 및 장교 후보생',
+};
+
+// ---------- 1단계: 신분 선택 ----------
+document.querySelectorAll('.category-btn').forEach((btn) => {
+  btn.onclick = () => {
+    const category = btn.dataset.category;
+    if (category === 'trainee') {
+      $('categoryScreen').style.display = 'none';
+      $('setupScreen').style.display = 'block';
+    } else {
+      // 훈련병이 아니면 기수/날짜 물어볼 필요 없이 바로 식단으로
+      const setting = { category, gigsu: null, enlistDate: null, unknown: true };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(setting));
+      showResult(setting);
+    }
+  };
+});
+
+$('backToCategoryLink').onclick = (e) => {
+  e.preventDefault();
+  $('setupScreen').style.display = 'none';
+  $('categoryScreen').style.display = 'block';
+};
+
+// ---------- 2단계 (훈련병만): 기수 / 입소일 / 모르겠어요 ----------
+const tabGigsu = $('tabGigsu');
+const tabDate = $('tabDate');
+const tabUnknown = $('tabUnknown');
+const gigsuField = $('gigsuField');
+const dateField = $('dateField');
+const unknownField = $('unknownField');
+const gigsuSelect = $('gigsuSelect');
+const dateInput = $('dateInput');
+const confirmBtn = $('confirmBtn');
+const setupError = $('setupError');
+
+let mode = 'gigsu';
+
+tabGigsu.onclick = () => setMode('gigsu');
+tabDate.onclick = () => setMode('date');
+tabUnknown.onclick = () => setMode('unknown');
+
+function setMode(m) {
+  mode = m;
+  tabGigsu.classList.toggle('active', m === 'gigsu');
+  tabDate.classList.toggle('active', m === 'date');
+  tabUnknown.classList.toggle('active', m === 'unknown');
+  gigsuField.style.display = m === 'gigsu' ? 'block' : 'none';
+  dateField.style.display = m === 'date' ? 'block' : 'none';
+  unknownField.style.display = m === 'unknown' ? 'block' : 'none';
+}
+
+async function loadCohortOptions() {
+  try {
+    const res = await fetch('/api/cohorts');
+    const list = await res.json();
+    gigsuSelect.innerHTML = list.map((g) => `<option value="${g}">${g}기</option>`).join('')
+      || '<option value="">등록된 기수가 없어요</option>';
+  } catch (e) {
+    gigsuSelect.innerHTML = '<option value="">불러오기 실패</option>';
+  }
+}
+loadCohortOptions();
+
+confirmBtn.onclick = async () => {
+  setupError.textContent = '';
+
+  if (mode === 'unknown') {
+    const setting = { category: 'trainee', gigsu: null, enlistDate: null, unknown: true };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(setting));
+    showResult(setting);
+    return;
+  }
+
+  let query;
+  if (mode === 'gigsu') {
+    if (!gigsuSelect.value) { setupError.textContent = '기수를 선택해주세요.'; return; }
+    query = `gigsu=${gigsuSelect.value}`;
+  } else {
+    if (!dateInput.value) { setupError.textContent = '날짜를 선택해주세요.'; return; }
+    query = `enlistDate=${dateInput.value}`;
+  }
+
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = '확인하는 중...';
+  try {
+    const res = await fetch(`/api/status?${query}`);
+    const data = await res.json();
+    if (data.error) {
+      setupError.textContent = data.error;
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = '확인';
+      return;
+    }
+    const setting = {
+      category: 'trainee',
+      gigsu: mode === 'gigsu' ? gigsuSelect.value : null,
+      enlistDate: mode === 'date' ? dateInput.value : null,
+      unknown: false,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(setting));
+    showResult(setting);
+  } catch (e) {
+    setupError.textContent = '서버에 연결하지 못했어요.';
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = '확인';
+  }
+};
+
+$('resetLink').onclick = (e) => {
+  e.preventDefault();
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+};
+
+async function showResult(setting) {
+  $('categoryScreen').style.display = 'none';
+  $('setupScreen').style.display = 'none';
+  $('resultScreen').style.display = 'block';
+  $('cohortLabel').textContent = setting.category === 'trainee' && setting.gigsu ? `${setting.gigsu}기` : (CATEGORY_LABELS[setting.category] || '');
+
+  const showDday = setting.category === 'trainee' && !setting.unknown;
+  $('progressCard').style.display = showDday ? 'flex' : 'none';
+  $('miniDday').style.display = showDday ? 'block' : 'none';
+
+  if (showDday) {
+    const query = setting.gigsu ? `gigsu=${setting.gigsu}` : `enlistDate=${setting.enlistDate}`;
+    const res = await fetch(`/api/status?${query}`);
+    const data = await res.json();
+
+    if (data.error) {
+      $('ddayText').textContent = '오류';
+      $('estimateNote').textContent = data.error;
+      $('estimateNote').classList.add('open');
+      $('miniDday').textContent = '오류';
+    } else {
+      const ddayLabel = data.daysLeft === 0 ? '수료!' : `D-${data.daysLeft}`;
+      $('ddayText').textContent = ddayLabel;
+      $('miniDday').textContent = `수료까지 ${ddayLabel} · ${data.percent}%`;
+      $('barFill').style.width = `${data.percent}%`;
+      $('percentLabel').textContent = `${data.percent}% 완료`;
+      $('estimateNote').textContent = data.source === 'estimate'
+        ? `입소일(${data.enlistDate}) 기준 약 5주 후로 추정한 수료일(${data.completionDate})이에요. 정확한 날짜가 확인되면 더 정확해져요.`
+        : `입소일 ${data.enlistDate} · 수료일 ${data.completionDate}`;
+    }
+  }
+
+  currentCategory = setting.category;
+  // 화면을 열 때마다 항상 "오늘" 날짜로 자동 설정
+  const todayISO = toLocalISODate(new Date());
+  $('menuDateInput').value = todayISO;
+  updateDateLabel(todayISO);
+  loadMenu(todayISO);
+}
+
+// 필드 이름이 패키지 버전마다 다를 수 있어서, 있을 법한 이름들을 순서대로 찾아본다.
+function pick(obj, keys) {
+  for (const k of keys) {
+    if (obj && obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return obj[k];
+  }
+  return undefined;
+}
+
+const NAME_KEYS = ['name', 'menuName', 'itemName', 'dishName', 'foodName'];
+const IMAGE_KEYS = ['image', 'imageUrl', 'photoUrl', 'thumbnail', 'thumbnailUrl', 'imgUrl', 'picUrl', 'photo'];
+const KCAL_KEYS = ['kcal', 'calorie', 'calories', 'energy'];
+const NUTRITION_OBJ_KEYS = ['nutrition', 'nutrients', 'nutritionInfo']; // 영양정보가 중첩 객체로 들어있는 경우
+
+// kcal이 최상위에 없으면 nutrition 같은 중첩 객체 안(calories 등)도 확인
+function pickKcal(m) {
+  const direct = pick(m, KCAL_KEYS);
+  if (direct !== undefined) return direct;
+  for (const nk of NUTRITION_OBJ_KEYS) {
+    if (m && m[nk]) {
+      const v = pick(m[nk], KCAL_KEYS);
+      if (v !== undefined) return v;
+    }
+  }
+  return undefined;
+}
+const DETAIL_KEYS = ['components', 'subMenus', 'detailMenus', 'items', 'sideMenus', 'children', 'menuList', 'foods'];
+
+// 안 보여줄 식사 시간대
+const EXCLUDED_MEALTIMES = ['야식', '간식', '새벽식'];
+// 간편식 브랜드 목록은 신분(카테고리)마다 달라서, /api/menu 응답에서 매번 받아와 여기에 채움
+let currentConvenienceBrands = [];
+let currentReservationOnlyBrands = []; // 로카프랩처럼 예약 전용이라 데이터 자체가 없는 브랜드
+let currentCategory = 'instructor';
+const CATEGORY_KEYS = ['category', 'foodCategory', 'type', 'foodType', 'cuisineType', 'groupName', 'menuCategory', 'brand', 'brandName'];
+// courseType이 "EE"/"DD" 같은 코드로 오는 경우도 있어서 보조 수단으로 둠 (courseTxt가 우선)
+const COURSE_TYPE_BRAND_MAP = { EE: '마이보글', DD: 'T/O', CC: '로카프랩' };
+
+// 영양성분으로 보이는 필드들 (한글/영문 다 시도)
+const NUTRI_CANDIDATES = [
+  ['protein', '단백질'], ['단백질', '단백질'],
+  ['carbohydrate', '탄수화물'], ['carb', '탄수화물'], ['탄수화물', '탄수화물'],
+  ['fat', '지방'], ['지방', '지방'],
+  ['sodium', '나트륨'], ['나트륨', '나트륨'],
+  ['sugar', '당류'], ['당류', '당류'],
+  ['cholesterol', '콜레스테롤'],
+  ['saturatedFat', '포화지방'],
+  ['transFat', '트랜스지방'],
+  ['calcium', '칼슘'],
+];
+
+function resolveImageUrl(raw) {
+  if (!raw) return null;
+  if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+  if (raw.startsWith('//')) return 'https:' + raw;
+  if (raw.startsWith('/')) return 'http://welstory.com' + raw; // 상대경로 추정
+  return raw;
+}
+
+function buildMenuCard(m, { showImage = true } = {}) {
+  const name = pick(m, NAME_KEYS) ?? '메뉴';
+  const imageRaw = showImage ? pick(m, IMAGE_KEYS) : null;
+  const image = resolveImageUrl(imageRaw);
+  const kcal = pickKcal(m);
+
+  let detailList = null;
+  for (const k of DETAIL_KEYS) {
+    if (Array.isArray(m[k]) && m[k].length > 1) { detailList = m[k]; break; }
+  }
+  let detailNames = detailList
+    ? detailList.map((d) => (typeof d === 'string' ? d : pick(d, NAME_KEYS) ?? '')).filter(Boolean)
+    : [];
+  // 이름이 결국 1개뿐이고 그게 메인 메뉴 이름과 같으면(=완전 중복) 따로 안 보여줌
+  if (detailNames.length <= 1 && (detailNames[0] ?? name) === name) {
+    detailNames = [];
+  }
+
+  const card = document.createElement('div');
+  card.className = 'menu-card';
+
+  const thumbHtml = image ? `<img class="thumb" src="${image}" onerror="this.style.display='none'" />` : '';
+
+  const detailHtml = detailNames.length
+    ? `<div class="detail-list">${detailNames.join(' · ')}</div>`
+    : '';
+
+  card.innerHTML = `
+    ${thumbHtml}
+    <div class="info">
+      <div class="name">${name}</div>
+      ${kcal ? `<div class="kcal">${kcal} kcal</div>` : ''}
+      ${detailHtml}
+      <div class="tap-hint">눌러서 ${showImage ? '영양성분' : '상세메뉴'} 보기</div>
+    </div>
+  `;
+  card.onclick = () => openNutriModal(m, name, image);
+  return card;
+}
+
+function detectBrand(m) {
+  if (!currentConvenienceBrands.length) return null; // 훈련병처럼 간편식 자체가 없는 신분
+
+  const courseTxt = m?.courseTxt ?? '';
+  const exact = currentConvenienceBrands.find((b) => courseTxt === b || courseTxt.includes(b));
+  if (exact) return exact;
+
+  const courseType = m?.courseType ?? '';
+  if (COURSE_TYPE_BRAND_MAP[courseType] && currentConvenienceBrands.includes(COURSE_TYPE_BRAND_MAP[courseType])) {
+    return COURSE_TYPE_BRAND_MAP[courseType];
+  }
+
+  const name = pick(m, NAME_KEYS) ?? '';
+  const category = pick(m, CATEGORY_KEYS) ?? '';
+  return (
+    currentConvenienceBrands.find((b) => category === b || category.includes(b)) ||
+    currentConvenienceBrands.find((b) => name.includes(b)) ||
+    null
+  );
+}
+
+// obj(또는 obj.nutrition 같은 중첩 객체) 안에서 알아볼 수 있는 영양성분 필드를 찾아 [라벨, 값] 배열로 반환
+function extractNutriFields(obj) {
+  if (!obj) return [];
+  const nutriObj = NUTRITION_OBJ_KEYS.map((k) => obj[k]).find((v) => v && typeof v === 'object') || obj;
+  const found = [];
+  for (const [key, label] of NUTRI_CANDIDATES) {
+    if (nutriObj[key] !== undefined && nutriObj[key] !== null && nutriObj[key] !== '') {
+      found.push([label, formatNutriValue(key, nutriObj[key])]);
+    }
+  }
+  return found;
+}
+
+// 단위(g/mg)까지 붙여서 보여줌 - 필드 이름으로 대략 추정
+function formatNutriValue(key, v) {
+  if (typeof v !== 'number') return v;
+  const mgFields = ['sodium', '나트륨', 'cholesterol', '콜레스테롤', 'calcium', '칼슘'];
+  if (mgFields.includes(key)) return `${v} mg`;
+  return `${v} g`;
+}
+
+// 밥/국/반찬 구성이 들어있을 법한 문자열 필드 (쉼표로 나열된 형태일 가능성) - subMenuTxt가 실제 필드명으로 확인됨
+const DESC_KEYS = ['subMenuTxt', 'description', 'menuDescription', 'detail', 'desc', 'composition', 'menuComposition'];
+
+// components(밥/국/반찬 등 구성 메뉴) 목록을 rows html로 만들어줌
+function componentsRowsHtml(m) {
+  // 1순위: components 배열 (칼로리까지 있는 경우가 많아서 더 정보가 많음)
+  let list = null;
+  for (const k of DETAIL_KEYS) {
+    if (Array.isArray(m[k]) && m[k].length) { list = m[k]; break; }
+  }
+  if (list && list.length > 1) {
+    const rows = list
+      .map((d) => {
+        if (typeof d === 'string') return `<div class="nutri-row"><span class="k">${d}</span></div>`;
+        const dname = pick(d, NAME_KEYS) ?? '';
+        const dkcal = pickKcal(d);
+        return `<div class="nutri-row"><span class="k">${dname}</span>${dkcal !== undefined ? `<span class="v">${dkcal} kcal</span>` : ''}</div>`;
+      })
+      .join('');
+    return `<div class="brand-item-name" style="margin-top:0;padding-top:0;border-top:none;">구성 메뉴</div>${rows}`;
+  }
+
+  // 2순위: "군대리아,양배추샐러드*케요네즈,..." 같은 쉼표 나열 문자열 필드
+  const descStr = pick(m, DESC_KEYS);
+  const descParts = typeof descStr === 'string' && descStr.includes(',')
+    ? descStr.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  if (descParts.length > 1) {
+    const descRows = descParts.map((s) => `<div class="nutri-row"><span class="k">${s}</span></div>`).join('');
+    return `<div class="brand-item-name" style="margin-top:0;padding-top:0;border-top:none;">구성 메뉴</div>${descRows}`;
+  }
+
+  return '';
+}
+
+// 아이템 하나의 영양성분/기타 정보를 <div class="nutri-row"> 목록 html로 만들어줌 (모달에서 재사용)
+// comp-rows / nutri-rows-only 로 감싸서, 나중에 상세 API 응답이 오면 그 부분만 교체/추가할 수 있게 함
+function itemNutriRowsHtml(m) {
+  const rows = [];
+  const usedKeys = new Set([
+    ...NAME_KEYS, ...IMAGE_KEYS, ...DETAIL_KEYS, ...NUTRITION_OBJ_KEYS, ...DESC_KEYS,
+    'id', 'date', 'mealTimeId', 'restaurantId', 'vendor', 'isTakeOut', 'hallNo', 'courseType', 'courseTxt',
+  ]);
+
+  rows.push(...extractNutriFields(m));
+  NUTRI_CANDIDATES.forEach(([key]) => usedKeys.add(key));
+
+  const kcalVal = pickKcal(m);
+  if (kcalVal !== undefined) {
+    rows.unshift(['칼로리', `${kcalVal} kcal`]);
+    KCAL_KEYS.forEach((k) => usedKeys.add(k));
+  }
+
+  // 나머지 최상위 필드도 혹시 몰라 다 보여줌 (모르는 필드명 대비)
+  Object.keys(m || {}).forEach((k) => {
+    if (usedKeys.has(k)) return;
+    const v = m[k];
+    if (v === null || v === undefined || v === '') return;
+    if (typeof v === 'object') return;
+    rows.push([k, v]);
+  });
+
+  const nutriRowsOnly = rows.length
+    ? `<div class="section-label">영양성분</div>` + rows.map(([k, v]) => `<div class="nutri-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')
+    : '<div class="nutri-row"><span class="k">영양성분 정보가 없어요</span></div>';
+
+  return `<div class="comp-rows">${componentsRowsHtml(m)}</div><div class="nutri-rows-only">${nutriRowsOnly}</div>`;
+}
+
+// /api/menu-detail 로 진짜 구성메뉴(밥/국/반찬 낱개)와 영양성분을 가져와서
+// 이미 그려둔 comp-rows / nutri-rows-only 안의 내용을 교체/추가함
+async function loadFullDetail(m, blockEl) {
+  const { date, mealTimeId, hallNo, courseType } = m;
+  if (!date || !mealTimeId || !hallNo || !courseType) return;
+  try {
+    const params = new URLSearchParams({ date, mealTimeId, hallNo, courseType, category: currentCategory });
+    const res = await fetch(`/api/menu-detail?${params}`);
+    const data = await res.json();
+    if (!data || data.error) return;
+
+    const compEl = blockEl.querySelector('.comp-rows');
+    if (compEl && Array.isArray(data.components) && data.components.length) {
+      const rows = data.components
+        .map((d) => {
+          const dname = pick(d, NAME_KEYS) ?? '메뉴';
+          const dkcal = pickKcal(d);
+          return `<div class="nutri-row"><span class="k">${dname}</span>${dkcal !== undefined ? `<span class="v">${dkcal} kcal</span>` : ''}</div>`;
+        })
+        .join('');
+      compEl.innerHTML = `<div class="brand-item-name" style="margin-top:0;padding-top:0;border-top:none;">구성 메뉴</div>${rows}`;
+    }
+
+    const nutriEl = blockEl.querySelector('.nutri-rows-only');
+    if (nutriEl && data.nutrient) {
+      const existingLabels = new Set([...nutriEl.querySelectorAll('.nutri-row .k')].map((el) => el.textContent));
+      const nutrientList = Array.isArray(data.nutrient) ? data.nutrient : [data.nutrient];
+      // 반찬 하나하나의 영양성분을 다 더해서 "합계"로 만듦 (안 그러면 당류/칼슘 등이 반찬 개수만큼 중복돼서 뜸)
+      const summed = {};
+      nutrientList.forEach((n) => {
+        const nutriObj = NUTRITION_OBJ_KEYS.map((k) => n[k]).find((v) => v && typeof v === 'object') || n;
+        for (const [key] of NUTRI_CANDIDATES) {
+          if (typeof nutriObj[key] === 'number') {
+            summed[key] = (summed[key] || 0) + nutriObj[key];
+          }
+        }
+      });
+      Object.keys(summed).forEach((k) => { summed[k] = Math.round(summed[k] * 10) / 10; });
+      const extraRows = extractNutriFields(summed).filter(([label]) => !existingLabels.has(label));
+      if (extraRows.length) {
+        nutriEl.insertAdjacentHTML(
+          'beforeend',
+          extraRows.map(([k, v]) => `<div class="nutri-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')
+        );
+      }
+    }
+  } catch (e) {
+    // 상세 정보 못 가져와도 이미 보여준 기본 정보는 남아있으니 조용히 무시
+  }
+}
+
+// 간편식 칸: 브랜드별로 한 줄씩 보여주고, 누르면 그 브랜드의 실제 메뉴+영양성분이 모달에 뜸.
+// 예약 전용 브랜드(로카프랩 등)는 일반 메뉴 API에 데이터가 안 잡히니, 있든 없든 항상 안내 카드로 표시.
+function buildConvenienceSection(items) {
+  const wrap = document.createElement('div');
+  const h3 = document.createElement('h3');
+  h3.textContent = '간편식';
+  wrap.appendChild(h3);
+
+  const groups = new Map(); // 브랜드 -> 아이템 배열
+  items.forEach(({ m, brand }) => {
+    if (!groups.has(brand)) groups.set(brand, []);
+    const list = groups.get(brand);
+    // 아침/점심/저녁에 같은 메뉴가 똑같이 올라오는 경우가 많아서, 이름 기준으로 중복 제거
+    const name = pick(m, NAME_KEYS) ?? '';
+    if (!list.some((existing) => (pick(existing, NAME_KEYS) ?? '') === name)) {
+      list.push(m);
+    }
+  });
+
+  const orderedBrands = [
+    ...currentConvenienceBrands.filter((b) => groups.has(b)),
+    ...[...groups.keys()].filter((b) => !currentConvenienceBrands.includes(b)),
+  ];
+
+  orderedBrands.forEach((brand) => {
+    const brandItems = groups.get(brand);
+    const card = document.createElement('div');
+    card.className = 'menu-card convenience-card';
+    card.innerHTML = `
+      <div class="info">
+        <div class="name">${brand}</div>
+        <div class="tap-hint">눌러서 오늘 메뉴/영양성분 보기 (${brandItems.length}개)</div>
+      </div>
+    `;
+    card.onclick = () => openBrandModal(brand, brandItems);
+    wrap.appendChild(card);
+  });
+
+  // 로카프랩처럼 예약 전용이라 데이터가 원래 안 잡히는 브랜드는, 목록에 없어도 항상 안내 카드로 보여줌
+  currentReservationOnlyBrands
+    .filter((b) => !groups.has(b))
+    .forEach((brand) => {
+      const card = document.createElement('div');
+      card.className = 'menu-card convenience-card';
+      card.innerHTML = `
+        <div class="info">
+          <div class="name">${brand}</div>
+          <div class="tap-hint">눌러서 안내 보기</div>
+        </div>
+      `;
+      card.onclick = () => openReservationOnlyModal(brand);
+      wrap.appendChild(card);
+    });
+
+  return wrap;
+}
+
+// 모달을 열 때 history에 한 칸 쌓아둬서, 안드로이드 뒤로가기를 눌렀을 때
+// 앱이 통째로 꺼지는 게 아니라 모달만 닫히게 함 (TWA/앱에서 특히 중요)
+function openModal(id) {
+  $(id).classList.add('open');
+  history.pushState({ modalId: id }, '');
+}
+function closeModal(id) {
+  if (history.state && history.state.modalId === id) {
+    history.back(); // popstate 핸들러가 실제로 닫아줌
+  } else {
+    $(id).classList.remove('open');
+  }
+}
+window.addEventListener('popstate', () => {
+  document.querySelectorAll('.modal-overlay.open').forEach((el) => el.classList.remove('open'));
+});
+
+function openReservationOnlyModal(brand) {
+  $('nutriTitle').textContent = brand;
+  $('nutriImg').style.display = 'none';
+  $('nutriRows').innerHTML = `
+    <div class="nutri-row"><span class="k">${brand}은 예약제라 이 화면에서는 메뉴를 못 불러와요.</span></div>
+    <div class="nutri-row"><span class="k">삼성웰스토리 앱(웰스토리플러스)에서 직접 확인해주세요.</span></div>
+  `;
+  openModal('nutriModal');
+}
+
+function openBrandModal(brand, items) {
+  $('nutriTitle').textContent = brand;
+  $('nutriImg').style.display = 'none';
+  const container = $('nutriRows');
+  container.innerHTML = '';
+  items.forEach((m, idx) => {
+    const itemWrap = document.createElement('div');
+    // 대표 메뉴 이름을 또 제목처럼 보여주면 구성 메뉴 목록과 중복돼서 보기 안 좋으니 생략.
+    // 브랜드 안에 그룹이 여러 개일 때만 옅은 구분선으로 나눠줌.
+    const dividerHtml = idx > 0 ? '<div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);"></div>' : '';
+    itemWrap.innerHTML = dividerHtml + itemNutriRowsHtml(m);
+    container.appendChild(itemWrap);
+    loadFullDetail(m, itemWrap);
+  });
+  openModal('nutriModal');
+}
+
+function openNutriModal(m, name, image) {
+  $('nutriTitle').textContent = name;
+  const img = $('nutriImg');
+  if (image) { img.src = image; img.style.display = 'block'; img.onerror = () => img.style.display = 'none'; }
+  else { img.style.display = 'none'; }
+  const rowsEl = $('nutriRows');
+  rowsEl.innerHTML = itemNutriRowsHtml(m);
+  loadFullDetail(m, rowsEl);
+  openModal('nutriModal');
+}
+
+$('nutriClose').onclick = () => closeModal('nutriModal');
+$('nutriModal').onclick = (e) => { if (e.target.id === 'nutriModal') closeModal('nutriModal'); };
+
+$('progressCard').onclick = () => $('estimateNote').classList.toggle('open');
+
+// ---------- 우측 상단 메뉴 / 라이선스 ----------
+$('topMenuBtn').onclick = (e) => {
+  e.stopPropagation();
+  $('topMenuDropdown').classList.toggle('open');
+};
+document.addEventListener('click', () => $('topMenuDropdown').classList.remove('open'));
+
+$('bugReportBtn').onclick = () => {
+  $('topMenuDropdown').classList.remove('open');
+  if (confirm('카카오톡 오픈채팅으로 연결됩니다. 계속할까요?')) {
+    window.open('https://open.kakao.com/me/hyangmeong', '_blank', 'noopener');
+  }
+};
+
+$('licenseOpenBtn').onclick = () => {
+  $('topMenuDropdown').classList.remove('open');
+  openModal('licenseModal');
+};
+$('licenseClose').onclick = () => closeModal('licenseModal');
+$('licenseModal').onclick = (e) => { if (e.target.id === 'licenseModal') closeModal('licenseModal'); };
+
+
+$('easterEggRow').onclick = () => {
+  const el = $('easterEggReveal');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+};
+
+async function loadMenu(dateISO) {
+  const menuArea = $('menuArea');
+  const menuStatus = $('menuStatus');
+  menuArea.innerHTML = '';
+  menuStatus.textContent = '불러오는 중...';
+  updateDateLabel(dateISO);
+  try {
+    const dateParam = (dateISO || toLocalISODate(new Date())).replaceAll('-', '');
+    const res = await fetch(`/api/menu?date=${dateParam}&category=${currentCategory}`);
+    const data = await res.json();
+    if (data.error) {
+      menuStatus.textContent = data.error;
+      return;
+    }
+    currentConvenienceBrands = data.convenienceBrands || [];
+    currentReservationOnlyBrands = data.reservationOnlyBrands || [];
+
+    menuStatus.textContent = '';
+    const meals = (data.meals || []).filter(
+      (meal) => !EXCLUDED_MEALTIMES.some((ex) => (meal.mealTime || '').includes(ex))
+    );
+    if (!meals.length) {
+      menuStatus.textContent = '이 날짜엔 등록된 메뉴가 없어요.';
+      return;
+    }
+
+    const allConvenienceItems = [];
+    meals.forEach((meal) => {
+      const regularItems = [];
+      (meal.menus || []).forEach((m) => {
+        const brand = detectBrand(m);
+        if (brand) {
+          allConvenienceItems.push({ m, brand });
+        } else {
+          regularItems.push(m);
+        }
+      });
+
+      if (regularItems.length) {
+        const block = document.createElement('div');
+        block.className = 'meal-block';
+        const h3 = document.createElement('h3');
+        h3.textContent = meal.mealTime;
+        block.appendChild(h3);
+        regularItems.forEach((m) => block.appendChild(buildMenuCard(m)));
+        menuArea.appendChild(block);
+      }
+    });
+
+    if (currentConvenienceBrands.length && (allConvenienceItems.length || currentReservationOnlyBrands.length)) {
+      menuArea.appendChild(buildConvenienceSection(allConvenienceItems));
+    }
+  } catch (e) {
+    menuStatus.textContent = '식단을 불러오지 못했어요.';
+  }
+}
+
+const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+function updateDateLabel(dateISO) {
+  if (!dateISO) return;
+  const d = new Date(dateISO + 'T00:00:00');
+  $('dateLabel').textContent = `${d.getMonth() + 1}월 ${d.getDate()}일 (${WEEKDAY_KO[d.getDay()]})`;
+}
+
+$('dateDisplayBtn').onclick = () => {
+  const input = $('menuDateInput');
+  try {
+    input.showPicker();
+  } catch (e) {
+    input.focus();
+    input.click();
+  }
+};
+
+$('menuDateInput').onchange = () => loadMenu($('menuDateInput').value);
+$('todayBtn').onclick = () => {
+  const todayISO = toLocalISODate(new Date());
+  $('menuDateInput').value = todayISO;
+  loadMenu(todayISO);
+};
+
+function shiftDate(offsetDays) {
+  const current = $('menuDateInput').value || toLocalISODate(new Date());
+  const d = new Date(current + 'T00:00:00');
+  d.setDate(d.getDate() + offsetDays);
+  const nextISO = toLocalISODate(d);
+  $('menuDateInput').value = nextISO;
+  loadMenu(nextISO);
+}
+$('prevDayBtn').onclick = () => shiftDate(-1);
+$('nextDayBtn').onclick = () => shiftDate(1);
+
+// 이미 설정된 게 있으면 바로 결과 화면으로
+const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+if (saved) {
+  // 신분 선택 기능 추가 이전에 저장된 값과의 호환 처리
+  if (!saved.category) saved.category = 'trainee';
+  showResult(saved);
+}
+
+// 방문 기록 (앱 화면엔 아무것도 안 보임, 관리자만 서버에서 확인)
+fetch('/api/visit', { method: 'POST' }).catch(() => {});
+
+// 진주(공군교육사령부) 실시간 날씨
+fetch('/api/weather')
+  .then((res) => res.json())
+  .then((data) => {
+    if (data && data.temp !== undefined) {
+      $('weatherChip').textContent = `${data.emoji} 진주 ${Math.round(data.temp)}°C`;
+    }
+  })
+  .catch(() => {});
+</script>
+</body>
+</html>
