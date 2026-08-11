@@ -53,6 +53,7 @@ app.get('/api/weather', async (req, res) => {
 });
 
 // ---------- 일일 방문자 수 (앱 화면엔 절대 표시 안 하고, 관리자만 비밀 주소로 확인) ----------
+// 날짜별로 { totalVisits: 총 방문횟수(중복 포함), uniqueVisitors: 순 방문자수, visitorIds: 그날 다녀간 익명ID 목록 } 저장
 const visitsPath = new URL('./data/visits.json', import.meta.url);
 function readVisits() {
   try {
@@ -73,7 +74,19 @@ app.post('/api/visit', (req, res) => {
   try {
     const visits = readVisits();
     const today = todayKST();
-    visits[today] = (visits[today] || 0) + 1;
+    if (!visits[today] || typeof visits[today] !== 'object') {
+      visits[today] = { totalVisits: 0, uniqueVisitors: 0, visitorIds: [] };
+    }
+    visits[today].totalVisits += 1;
+
+    const visitorId = (req.body && req.body.visitorId) ? String(req.body.visitorId).slice(0, 64) : null;
+    if (visitorId) {
+      if (!Array.isArray(visits[today].visitorIds)) visits[today].visitorIds = [];
+      if (!visits[today].visitorIds.includes(visitorId)) {
+        visits[today].visitorIds.push(visitorId);
+        visits[today].uniqueVisitors += 1;
+      }
+    }
     writeVisits(visits);
     res.json({ ok: true });
   } catch (e) {
@@ -88,9 +101,20 @@ app.get('/api/admin/stats', (req, res) => {
     return res.status(403).json({ error: '접근 권한이 없어요.' });
   }
   const visits = readVisits();
-  const sortedDates = Object.keys(visits).sort();
-  const total = Object.values(visits).reduce((a, b) => a + b, 0);
-  res.json({ total, byDate: visits, dates: sortedDates });
+  const dates = Object.keys(visits).sort();
+  const byDate = {};
+  let totalVisits = 0;
+  dates.forEach((d) => {
+    const entry = visits[d];
+    // 예전 형식(날짜당 숫자 하나)이었던 기록과의 호환 처리
+    const t = typeof entry === 'object' ? (entry.totalVisits || 0) : (entry || 0);
+    const u = typeof entry === 'object' ? (entry.uniqueVisitors || 0) : 0;
+    byDate[d] = { totalVisits: t, uniqueVisitors: u };
+    totalVisits += t;
+  });
+  // 참고: 순 방문자수는 "그날 다녀간 사람 수"라서 여러 날 합산하는 건 의미가 없어요 (같은 사람이 여러 날 오면 중복 카운트됨).
+  // 날짜별 uniqueVisitors 값을 각각 보시는 게 정확해요.
+  res.json({ totalVisits, byDate, dates });
 });
 
 // ---------- 기수 <-> 날짜 계산 ----------

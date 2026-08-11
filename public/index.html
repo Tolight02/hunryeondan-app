@@ -238,11 +238,18 @@
     font-weight: 700;
   }
   .top-bar .weather-chip {
-    color: var(--muted);
-    font-size: 13px;
-    font-weight: 600;
-    margin-top: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--accent-soft-2);
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 800;
   }
+  .top-bar .weather-chip:empty { display: none; }
   .progress-card {
     background: var(--card);
     border-radius: var(--radius-md);
@@ -486,6 +493,32 @@
     border-top: 1.5px solid var(--line);
   }
   .brand-item-name:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+  .brand-mealtime-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft-2);
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 6px;
+  }
+  .faq-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .faq-item:last-of-type { border-bottom: none; }
+  .faq-q {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .faq-a {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
   .modal-close {
     display: block;
     width: 100%;
@@ -515,8 +548,52 @@
 
 <button id="topMenuBtn" aria-label="메뉴">☰</button>
 <div id="topMenuDropdown" class="top-menu-dropdown">
+  <button id="faqOpenBtn" type="button">❓ 자주 묻는 질문</button>
   <button id="bugReportBtn" type="button">🐛 버그 제보</button>
   <button id="licenseOpenBtn" type="button">📄 라이선스</button>
+</div>
+
+<div class="modal-overlay" id="faqModal">
+  <div class="modal-sheet">
+    <h3>자주 묻는 질문</h3>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 이 앱은 삼성웰스토리 공식 앱인가요?</div>
+      <div class="faq-a">아니요, 개인이 만든 비공식 앱이에요. 정확한 최신 정보는 삼성웰스토리 공식 앱(웰스토리플러스)에서 다시 확인해주세요.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 로그인이나 회원가입을 해야 하나요?</div>
+      <div class="faq-a">아니요. 신분(훈련병/조교/특기학교 및 진주 자대/부사관 및 장교 후보생)만 선택하면 바로 이용할 수 있어요.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 훈련병인데 왜 메뉴가 조교보다 적게 보이나요?</div>
+      <div class="faq-a">훈련병은 실제로 "한식"으로 분류된 메뉴만 먹기 때문에, 일품/간편식 메뉴는 일부러 안 보여드리고 있어요. 실제로 못 먹는 메뉴가 보이면 오히려 헷갈릴 수 있으니까요.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 로카프랩 메뉴가 자세히 안 보여요.</div>
+      <div class="faq-a">로카프랩은 예약 전용 시스템이라, 이 앱이 가져오는 일반 메뉴 정보에는 자세한 내용이 없어요. 간편식 칸에서 "로카프랩"을 누르면 삼성웰스토리 앱에서 확인해달라는 안내가 떠요.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 수료 D-day가 정확한가요?</div>
+      <div class="faq-a">등록된 기수는 실제 입영일·수료일 기준이라 정확해요. 아직 등록 안 된 최신 기수는 입영일+32일로 추정한 값이라 며칠 정도 오차가 있을 수 있어요.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 실제 식단이랑 달라요.</div>
+      <div class="faq-a">현장 사정으로 메뉴가 바뀌는 경우가 있어요. 이 앱은 참고용이니, 정확한 확인은 삼성웰스토리 앱을 이용해주세요.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 버그를 발견했거나 건의하고 싶은 게 있어요.</div>
+      <div class="faq-a">메뉴(☰) → 버그 제보를 눌러 카카오 오픈채팅으로 알려주세요. 반영해드릴게요.</div>
+    </div>
+
+    <button class="modal-close" id="faqClose">닫기</button>
+  </div>
 </div>
 
 <div class="modal-overlay" id="licenseModal">
@@ -627,8 +704,10 @@
       <button id="nextDayBtn" class="arrow-btn" aria-label="다음 날짜">›</button>
       <button id="todayBtn">오늘</button>
     </div>
+    <div id="mealTabs" class="tabs meal-tabs" style="display:none;"></div>
     <div id="menuArea"></div>
     <div id="menuStatus"></div>
+    <div id="convenienceArea"></div>
   </div>
 
   <a href="#" class="reset-link" id="resetLink">처음부터 다시 설정하기</a>
@@ -1084,14 +1163,18 @@ function buildConvenienceSection(items) {
   h3.textContent = '간편식';
   wrap.appendChild(h3);
 
-  const groups = new Map(); // 브랜드 -> 아이템 배열
-  items.forEach(({ m, brand }) => {
+  const groups = new Map(); // 브랜드 -> [{m, mealTimes:Set}]
+  items.forEach(({ m, brand, mealTime }) => {
     if (!groups.has(brand)) groups.set(brand, []);
     const list = groups.get(brand);
-    // 아침/점심/저녁에 같은 메뉴가 똑같이 올라오는 경우가 많아서, 이름 기준으로 중복 제거
+    // 아침/점심/저녁에 같은 메뉴가 똑같이 올라오는 경우가 많아서, 이름 기준으로 중복 제거하되
+    // 어느 끼니에 나왔는지는 다 모아둠 (몇 시에 제공되는 간편식인지 보여주기 위해)
     const name = pick(m, NAME_KEYS) ?? '';
-    if (!list.some((existing) => (pick(existing, NAME_KEYS) ?? '') === name)) {
-      list.push(m);
+    const existing = list.find((e) => (pick(e.m, NAME_KEYS) ?? '') === name);
+    if (existing) {
+      if (mealTime) existing.mealTimes.add(mealTime);
+    } else {
+      list.push({ m, mealTimes: new Set(mealTime ? [mealTime] : []) });
     }
   });
 
@@ -1100,13 +1183,21 @@ function buildConvenienceSection(items) {
     ...[...groups.keys()].filter((b) => !currentConvenienceBrands.includes(b)),
   ];
 
+  const MEAL_ORDER = ['아침', '점심', '저녁'];
   orderedBrands.forEach((brand) => {
     const brandItems = groups.get(brand);
+    // 이 브랜드가 실제로 나온 끼니들을 다 모아서 "아침 · 저녁 제공" 처럼 보여줌 (실제 데이터 기반)
+    const mealTimesUnion = new Set();
+    brandItems.forEach((it) => it.mealTimes.forEach((mt) => mealTimesUnion.add(mt)));
+    const mealTimesSorted = MEAL_ORDER.filter((mt) => mealTimesUnion.has(mt));
+    const timeLabel = mealTimesSorted.length ? `${mealTimesSorted.join(' · ')} 제공` : '';
+
     const card = document.createElement('div');
     card.className = 'menu-card convenience-card';
     card.innerHTML = `
       <div class="info">
         <div class="name">${brand}</div>
+        ${timeLabel ? `<div class="kcal">${timeLabel}</div>` : ''}
         <div class="tap-hint">눌러서 오늘 메뉴/영양성분 보기 (${brandItems.length}개)</div>
       </div>
     `;
@@ -1160,17 +1251,20 @@ function openReservationOnlyModal(brand) {
   openModal('nutriModal');
 }
 
-function openBrandModal(brand, items) {
+function openBrandModal(brand, entries) {
   $('nutriTitle').textContent = brand;
   $('nutriImg').style.display = 'none';
   const container = $('nutriRows');
   container.innerHTML = '';
-  items.forEach((m, idx) => {
+  entries.forEach(({ m, mealTimes }, idx) => {
     const itemWrap = document.createElement('div');
     // 대표 메뉴 이름을 또 제목처럼 보여주면 구성 메뉴 목록과 중복돼서 보기 안 좋으니 생략.
     // 브랜드 안에 그룹이 여러 개일 때만 옅은 구분선으로 나눠줌.
     const dividerHtml = idx > 0 ? '<div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);"></div>' : '';
-    itemWrap.innerHTML = dividerHtml + itemNutriRowsHtml(m);
+    const mealTimeLabel = mealTimes && mealTimes.size
+      ? `<div class="brand-mealtime-label">${[...mealTimes].join(' · ')} 제공</div>`
+      : '';
+    itemWrap.innerHTML = dividerHtml + mealTimeLabel + itemNutriRowsHtml(m);
     container.appendChild(itemWrap);
     loadFullDetail(m, itemWrap);
   });
@@ -1207,6 +1301,13 @@ $('bugReportBtn').onclick = () => {
   }
 };
 
+$('faqOpenBtn').onclick = () => {
+  $('topMenuDropdown').classList.remove('open');
+  openModal('faqModal');
+};
+$('faqClose').onclick = () => closeModal('faqModal');
+$('faqModal').onclick = (e) => { if (e.target.id === 'faqModal') closeModal('faqModal'); };
+
 $('licenseOpenBtn').onclick = () => {
   $('topMenuDropdown').classList.remove('open');
   openModal('licenseModal');
@@ -1220,10 +1321,40 @@ $('easterEggRow').onclick = () => {
   el.style.display = el.style.display === 'none' ? 'block' : 'none';
 };
 
+let currentMealsData = {}; // { "아침": [items...], "점심": [...], ... } - 탭 전환용 캐시
+
+function pickDefaultMealTime(mealNames) {
+  const hour = new Date().getHours();
+  let preferred;
+  if (hour < 10) preferred = '아침';
+  else if (hour < 15) preferred = '점심';
+  else preferred = '저녁';
+  return mealNames.includes(preferred) ? preferred : mealNames[0];
+}
+
+function renderMealTab(mealName) {
+  const menuArea = $('menuArea');
+  menuArea.innerHTML = '';
+  const items = currentMealsData[mealName] || [];
+  if (!items.length) {
+    menuArea.innerHTML = '<div id="menuStatus2" style="text-align:center;color:var(--muted);padding:24px;font-size:14px;">이 끼니엔 등록된 메뉴가 없어요.</div>';
+    return;
+  }
+  items.forEach((m) => menuArea.appendChild(buildMenuCard(m)));
+
+  document.querySelectorAll('#mealTabs button').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.meal === mealName);
+  });
+}
+
 async function loadMenu(dateISO) {
   const menuArea = $('menuArea');
   const menuStatus = $('menuStatus');
+  const mealTabs = $('mealTabs');
+  const convenienceArea = $('convenienceArea');
   menuArea.innerHTML = '';
+  convenienceArea.innerHTML = '';
+  mealTabs.style.display = 'none';
   menuStatus.textContent = '불러오는 중...';
   updateDateLabel(dateISO);
   try {
@@ -1246,31 +1377,40 @@ async function loadMenu(dateISO) {
       return;
     }
 
+    // 끼니별 일반 메뉴 / 간편식(브랜드) 분리. 간편식엔 어느 끼니였는지 라벨도 같이 남겨둠.
+    currentMealsData = {};
     const allConvenienceItems = [];
     meals.forEach((meal) => {
       const regularItems = [];
       (meal.menus || []).forEach((m) => {
         const brand = detectBrand(m);
         if (brand) {
-          allConvenienceItems.push({ m, brand });
+          allConvenienceItems.push({ m, brand, mealTime: meal.mealTime });
         } else {
           regularItems.push(m);
         }
       });
-
-      if (regularItems.length) {
-        const block = document.createElement('div');
-        block.className = 'meal-block';
-        const h3 = document.createElement('h3');
-        h3.textContent = meal.mealTime;
-        block.appendChild(h3);
-        regularItems.forEach((m) => block.appendChild(buildMenuCard(m)));
-        menuArea.appendChild(block);
-      }
+      if (regularItems.length) currentMealsData[meal.mealTime] = regularItems;
     });
 
+    const mealNames = Object.keys(currentMealsData);
+    if (mealNames.length > 1) {
+      mealTabs.style.display = 'flex';
+      mealTabs.innerHTML = mealNames
+        .map((name) => `<button type="button" data-meal="${name}">${name}</button>`)
+        .join('');
+      mealTabs.querySelectorAll('button').forEach((btn) => {
+        btn.onclick = () => renderMealTab(btn.dataset.meal);
+      });
+      renderMealTab(pickDefaultMealTime(mealNames));
+    } else if (mealNames.length === 1) {
+      renderMealTab(mealNames[0]);
+    } else {
+      menuArea.innerHTML = '';
+    }
+
     if (currentConvenienceBrands.length && (allConvenienceItems.length || currentReservationOnlyBrands.length)) {
-      menuArea.appendChild(buildConvenienceSection(allConvenienceItems));
+      convenienceArea.appendChild(buildConvenienceSection(allConvenienceItems));
     }
   } catch (e) {
     menuStatus.textContent = '식단을 불러오지 못했어요.';
@@ -1321,17 +1461,30 @@ if (saved) {
 }
 
 // 방문 기록 (앱 화면엔 아무것도 안 보임, 관리자만 서버에서 확인)
-fetch('/api/visit', { method: 'POST' }).catch(() => {});
+// 순 방문자 수 계산을 위해 이 기기(브라우저)만의 익명 ID를 하나 만들어서 재사용함.
+// 이름/기기정보 등 개인식별 정보는 전혀 아니고, 그냥 무작위 문자열임.
+let visitorId = localStorage.getItem('hunryeondan_visitor_id');
+if (!visitorId) {
+  visitorId = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  localStorage.setItem('hunryeondan_visitor_id', visitorId);
+}
+fetch('/api/visit', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ visitorId }),
+}).catch(() => {});
 
 // 진주(공군교육사령부) 실시간 날씨
 fetch('/api/weather')
   .then((res) => res.json())
   .then((data) => {
-    if (data && data.temp !== undefined) {
+    if (data && data.temp !== undefined && data.temp !== null) {
       $('weatherChip').textContent = `${data.emoji} 진주 ${Math.round(data.temp)}°C`;
     }
   })
-  .catch(() => {});
+  .catch(() => {
+    // 조용히 실패 - 뱃지가 비어있으면 CSS가 알아서 숨겨줌
+  });
 </script>
 </body>
 </html>
