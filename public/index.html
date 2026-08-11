@@ -356,40 +356,40 @@
     font-weight: 700;
     line-height: 1;
   }
-  .meal-block { margin-bottom: 20px; }
+  .meal-block { margin-bottom: 14px; }
   .meal-block h3 {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 800;
     color: var(--accent);
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     padding-left: 2px;
   }
   .menu-card {
     background: var(--card);
     border: none;
     border-radius: var(--radius-md);
-    padding: 16px 18px;
-    margin-bottom: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
     box-shadow: var(--shadow);
     display: flex;
-    gap: 14px;
+    gap: 12px;
     align-items: flex-start;
   }
   .menu-card:active { background: var(--accent-soft-2); }
   .menu-card .thumb {
-    width: 58px; height: 58px; border-radius: var(--radius-sm); object-fit: cover;
+    width: 48px; height: 48px; border-radius: var(--radius-sm); object-fit: cover;
     background: var(--accent-soft); flex-shrink: 0;
   }
   .menu-card .info { flex: 1; min-width: 0; }
-  .menu-card .name { font-size: 17px; font-weight: 700; }
-  .menu-card .kcal { color: var(--muted); font-size: 13px; font-weight: 600; margin-top: 4px; }
+  .menu-card .name { font-size: 16px; font-weight: 700; }
+  .menu-card .kcal { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 2px; }
   .menu-card .detail-list {
-    margin-top: 6px;
-    font-size: 14px;
+    margin-top: 4px;
+    font-size: 12.5px;
     color: var(--muted);
-    line-height: 1.6;
+    line-height: 1.4;
   }
-  .menu-card .tap-hint { font-size: 12px; color: var(--accent); font-weight: 700; margin-top: 8px; }
+  .menu-card .tap-hint { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 4px; }
   #menuStatus { text-align: center; color: var(--muted); padding: 24px; font-size: 14px; }
 
   .brand-heading {
@@ -959,13 +959,20 @@ function buildMenuCard(m, { showImage = true } = {}) {
   const image = resolveImageUrl(imageRaw);
   const kcal = pickKcal(m);
 
+  let detailNames = [];
   let detailList = null;
   for (const k of DETAIL_KEYS) {
     if (Array.isArray(m[k]) && m[k].length > 1) { detailList = m[k]; break; }
   }
-  let detailNames = detailList
-    ? detailList.map((d) => (typeof d === 'string' ? d : pick(d, NAME_KEYS) ?? '')).filter(Boolean)
-    : [];
+  if (detailList) {
+    detailNames = detailList.map((d) => (typeof d === 'string' ? d : pick(d, NAME_KEYS) ?? '')).filter(Boolean);
+  } else {
+    // components 배열이 없거나 1개뿐이면, "군대리아,쌀밥,비지찌개,..." 같은 문자열 필드에서라도 가져옴
+    const descStr = pick(m, DESC_KEYS);
+    if (typeof descStr === 'string' && descStr.includes(',')) {
+      detailNames = descStr.split(',').map((s) => s.trim()).filter(Boolean);
+    }
+  }
   // 이름이 결국 1개뿐이고 그게 메인 메뉴 이름과 같으면(=완전 중복) 따로 안 보여줌
   if (detailNames.length <= 1 && (detailNames[0] ?? name) === name) {
     detailNames = [];
