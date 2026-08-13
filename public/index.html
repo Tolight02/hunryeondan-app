@@ -393,6 +393,9 @@
     word-break: keep-all;
     overflow-wrap: break-word;
   }
+  .menu-card .detail-item {
+    padding: 3px 0;
+  }
   .menu-card .tap-hint { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 4px; }
   #menuStatus { text-align: center; color: var(--muted); padding: 24px; font-size: 14px; }
 
@@ -962,10 +965,8 @@ function buildMenuCard(m, { showImage = true } = {}) {
       detailNames = descStr.split(',').map((s) => s.trim()).filter(Boolean);
     }
   }
-  // 이름이 결국 1개뿐이고 그게 메인 메뉴 이름과 같으면(=완전 중복) 따로 안 보여줌
-  if (detailNames.length <= 1 && (detailNames[0] ?? name) === name) {
-    detailNames = [];
-  }
+  // 대표 메뉴 이름(카드 제목으로 이미 보여줌)은 반찬 목록에서 빼서 중복으로 안 보이게 함
+  detailNames = detailNames.filter((n) => n !== name);
 
   const card = document.createElement('div');
   card.className = 'menu-card';
@@ -973,7 +974,7 @@ function buildMenuCard(m, { showImage = true } = {}) {
   const thumbHtml = image ? `<img class="thumb" src="${image}" onerror="this.style.display='none'" />` : '';
 
   const detailHtml = detailNames.length
-    ? `<div class="detail-list">${detailNames.join(' · ')}</div>`
+    ? `<div class="detail-list">${detailNames.map((n) => `<div class="detail-item">${n}</div>`).join('')}</div>`
     : '';
 
   card.innerHTML = `
