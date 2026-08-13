@@ -33,6 +33,8 @@
     font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif;
     font-size: 16px;
     line-height: 1.5;
+    word-break: keep-all;
+    overflow-wrap: break-word;
     -webkit-font-smoothing: antialiased;
   }
   button { font-family: inherit; cursor: pointer; }
@@ -385,9 +387,11 @@
   .menu-card .kcal { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 2px; }
   .menu-card .detail-list {
     margin-top: 4px;
-    font-size: 12.5px;
+    font-size: 13.5px;
     color: var(--muted);
-    line-height: 1.4;
+    line-height: 1.5;
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
   .menu-card .tap-hint { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 4px; }
   #menuStatus { text-align: center; color: var(--muted); padding: 24px; font-size: 14px; }
@@ -681,16 +685,6 @@
     <div class="weather-chip" id="weatherChip"></div>
   </div>
 
-  <div class="progress-card" id="progressCard" style="display:none;">
-    <div class="progress-main">
-      <div class="dday" id="ddayText">-</div>
-      <div class="dday-sub">수료까지</div>
-    </div>
-    <div class="progress-bar-wrap">
-      <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
-      <div class="percent-label" id="percentLabel">0%</div>
-    </div>
-  </div>
   <div class="estimate-note" id="estimateNote"></div>
 
   <div class="menu-section">
@@ -862,7 +856,6 @@ async function showResult(setting) {
   $('cohortLabel').textContent = setting.category === 'trainee' && setting.gigsu ? `${setting.gigsu}기` : (CATEGORY_LABELS[setting.category] || '');
 
   const showDday = setting.category === 'trainee' && !setting.unknown;
-  $('progressCard').style.display = showDday ? 'flex' : 'none';
   $('miniDday').style.display = showDday ? 'block' : 'none';
 
   if (showDday) {
@@ -871,16 +864,12 @@ async function showResult(setting) {
     const data = await res.json();
 
     if (data.error) {
-      $('ddayText').textContent = '오류';
       $('estimateNote').textContent = data.error;
       $('estimateNote').classList.add('open');
       $('miniDday').textContent = '오류';
     } else {
       const ddayLabel = data.daysLeft === 0 ? '수료!' : `D-${data.daysLeft}`;
-      $('ddayText').textContent = ddayLabel;
       $('miniDday').textContent = `수료까지 ${ddayLabel} · ${data.percent}%`;
-      $('barFill').style.width = `${data.percent}%`;
-      $('percentLabel').textContent = `${data.percent}% 완료`;
       $('estimateNote').textContent = data.source === 'estimate'
         ? `입소일(${data.enlistDate}) 기준 약 5주 후로 추정한 수료일(${data.completionDate})이에요. 정확한 날짜가 확인되면 더 정확해져요.`
         : `입소일 ${data.enlistDate} · 수료일 ${data.completionDate}`;
@@ -1292,7 +1281,8 @@ function openNutriModal(m, name, image) {
 $('nutriClose').onclick = () => closeModal('nutriModal');
 $('nutriModal').onclick = (e) => { if (e.target.id === 'nutriModal') closeModal('nutriModal'); };
 
-$('progressCard').onclick = () => $('estimateNote').classList.toggle('open');
+$('miniDday').onclick = () => $('estimateNote').classList.toggle('open');
+$('miniDday').style.cursor = 'pointer';
 
 // ---------- 우측 상단 메뉴 / 라이선스 ----------
 $('topMenuBtn').onclick = (e) => {
@@ -1487,10 +1477,12 @@ fetch('/api/weather')
   .then((data) => {
     if (data && data.temp !== undefined && data.temp !== null) {
       $('weatherChip').textContent = `${data.emoji} 진주 ${Math.round(data.temp)}°C`;
+    } else {
+      $('weatherChip').textContent = '날씨 정보를 불러오지 못했어요';
     }
   })
   .catch(() => {
-    // 조용히 실패 - 뱃지가 비어있으면 CSS가 알아서 숨겨줌
+    $('weatherChip').textContent = '날씨 정보를 불러오지 못했어요';
   });
 </script>
 </body>
