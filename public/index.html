@@ -367,6 +367,7 @@
     padding-left: 2px;
   }
   .menu-card {
+    position: relative;
     background: var(--card);
     border: none;
     border-radius: var(--radius-md);
@@ -378,11 +379,22 @@
     align-items: flex-start;
   }
   .menu-card:active { background: var(--accent-soft-2); }
+  .menu-card .kcal-badge {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft-2);
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
   .menu-card .thumb {
     width: 48px; height: 48px; border-radius: var(--radius-sm); object-fit: cover;
     background: var(--accent-soft); flex-shrink: 0;
   }
-  .menu-card .info { flex: 1; min-width: 0; }
+  .menu-card .info { flex: 1; min-width: 0; padding-right: 70px; }
   .menu-card .name { font-size: 16px; font-weight: 700; }
   .menu-card .kcal { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 2px; }
   .menu-card .detail-list {
@@ -565,13 +577,8 @@
     <h3>자주 묻는 질문</h3>
 
     <div class="faq-item">
-      <div class="faq-q">Q. 이 앱은 삼성웰스토리 공식 앱인가요?</div>
+      <div class="faq-q">Q. 공식 앱인가요?</div>
       <div class="faq-a">아니요, 개인이 만든 비공식 앱이에요. 정확한 최신 정보는 삼성웰스토리 공식 앱(웰스토리플러스)에서 다시 확인해주세요.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-q">Q. 로그인이나 회원가입을 해야 하나요?</div>
-      <div class="faq-a">아니요. 신분(훈련병/조교/특기학교 및 진주 자대/부사관 및 장교 후보생)만 선택하면 바로 이용할 수 있어요.</div>
     </div>
 
     <div class="faq-item">
@@ -585,13 +592,8 @@
     </div>
 
     <div class="faq-item">
-      <div class="faq-q">Q. 수료 D-day가 정확한가요?</div>
-      <div class="faq-a">등록된 기수는 실제 입영일·수료일 기준이라 정확해요. 아직 등록 안 된 최신 기수는 입영일+32일로 추정한 값이라 며칠 정도 오차가 있을 수 있어요.</div>
-    </div>
-
-    <div class="faq-item">
       <div class="faq-q">Q. 실제 식단이랑 달라요.</div>
-      <div class="faq-a">현장 사정으로 메뉴가 바뀌는 경우가 있어요. 이 앱은 참고용이니, 정확한 확인은 삼성웰스토리 앱을 이용해주세요.</div>
+      <div class="faq-a">현장 사정으로 메뉴가 바뀌는 경우가 있어요. 이 앱은 참고용으로만 사용해주세요.</div>
     </div>
 
     <div class="faq-item">
@@ -618,8 +620,8 @@
       <span class="k">그리고 한 명 더...? 👀</span><span class="v">눌러보세요</span>
     </div>
     <div id="easterEggReveal" style="display:none; padding-top:10px; font-size:13px; color:var(--muted); line-height:1.7;">
-      진짜 1등 공신은 지금 이 순간도 국가와 국민을 위해 일하고 있는 우리 군 장병들과,
-      사랑하는 아들/딸을 기다리고 계신 여러분입니다 🫡
+      진짜 1등 공신은 지금 이 순간도 국가와 국민을 지키고 있는 우리 군 장병들과,
+      소중한 사람을 기다리고 계신 여러분입니다 🫡
     </div>
 
     <button class="modal-close" id="licenseClose">닫기</button>
@@ -978,10 +980,10 @@ function buildMenuCard(m, { showImage = true } = {}) {
     : '';
 
   card.innerHTML = `
+    ${kcal ? `<div class="kcal-badge">총 ${kcal}kcal</div>` : ''}
     ${thumbHtml}
     <div class="info">
       <div class="name">${name}</div>
-      ${kcal ? `<div class="kcal">${kcal} kcal</div>` : ''}
       ${detailHtml}
       <div class="tap-hint">눌러서 ${showImage ? '영양성분' : '상세메뉴'} 보기</div>
     </div>
