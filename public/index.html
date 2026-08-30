@@ -358,6 +358,55 @@
     font-weight: 700;
     line-height: 1;
   }
+  .weekly-toggle-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--accent-soft-2);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .weekly-toggle-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+  .week-day-card {
+    background: var(--card);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+  }
+  .week-day-card:active { background: var(--accent-soft-2); }
+  .week-day-card .week-day-header {
+    font-weight: 800;
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .week-day-card .week-day-header.today { color: var(--accent); }
+  .week-meal-row {
+    display: flex;
+    gap: 8px;
+    font-size: 13px;
+    padding: 4px 0;
+    line-height: 1.5;
+  }
+  .week-meal-row .week-meal-label {
+    flex-shrink: 0;
+    width: 34px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .week-meal-row .week-meal-items {
+    color: var(--muted);
+    word-break: keep-all;
+  }
+  #weeklyStatus { text-align: center; color: var(--muted); padding: 24px; font-size: 14px; }
   .meal-block { margin-bottom: 14px; }
   .meal-block h3 {
     font-size: 14px;
@@ -703,10 +752,12 @@
       <button id="nextDayBtn" class="arrow-btn" aria-label="다음 날짜">›</button>
       <button id="todayBtn">오늘</button>
     </div>
+    <button id="weeklyToggleBtn" class="weekly-toggle-btn" type="button">📆 이번 주 식단 보기</button>
     <div id="mealTabs" class="tabs meal-tabs" style="display:none;"></div>
     <div id="menuArea"></div>
     <div id="menuStatus"></div>
     <div id="convenienceArea"></div>
+    <div id="weeklyArea" style="display:none;"></div>
   </div>
 
   <a href="#" class="reset-link" id="resetLink">처음부터 다시 설정하기</a>
@@ -1451,6 +1502,108 @@ function shiftDate(offsetDays) {
 }
 $('prevDayBtn').onclick = () => shiftDate(-1);
 $('nextDayBtn').onclick = () => shiftDate(1);
+
+// ---------- 주간보기 ----------
+let weeklyViewOn = false;
+
+function getWeekRange(dateISO) {
+  // dateISO가 속한 주(월~일)의 날짜 7개를 반환
+  const d = new Date((dateISO || toLocalISODate(new Date())) + 'T00:00:00');
+  const day = d.getDay(); // 0=일 ... 6=토
+  const mondayOffset = day === 0 ? -6 : 1 - day; // 이번 주 월요일까지 얼마나 이동해야 하는지
+  const monday = new Date(d);
+  monday.setDate(d.getDate() + mondayOffset);
+  const week = [];
+  for (let i = 0; i < 7; i++) {
+    const day2 = new Date(monday);
+    day2.setDate(monday.getDate() + i);
+    week.push(toLocalISODate(day2));
+  }
+  return week;
+}
+
+function setWeeklyView(on) {
+  weeklyViewOn = on;
+  const btn = $('weeklyToggleBtn');
+  btn.classList.toggle('active', on);
+  btn.textContent = on ? '📅 하루씩 보기' : '📆 이번 주 식단 보기';
+
+  $('mealTabs').style.display = on ? 'none' : $('mealTabs').style.display;
+  $('menuArea').style.display = on ? 'none' : 'block';
+  $('menuStatus').style.display = on ? 'none' : 'block';
+  $('convenienceArea').style.display = on ? 'none' : 'block';
+  $('weeklyArea').style.display = on ? 'block' : 'none';
+
+  if (on) {
+    loadWeeklyMenu();
+  } else {
+    loadMenu($('menuDateInput').value || toLocalISODate(new Date()));
+  }
+}
+
+$('weeklyToggleBtn').onclick = () => setWeeklyView(!weeklyViewOn);
+
+async function loadWeeklyMenu() {
+  const weeklyArea = $('weeklyArea');
+  weeklyArea.innerHTML = '<div id="weeklyStatus">한 주 식단을 불러오는 중...</div>';
+
+  const baseDate = $('menuDateInput').value || toLocalISODate(new Date());
+  const week = getWeekRange(baseDate);
+  const todayISO = toLocalISODate(new Date());
+
+  try {
+    const results = await Promise.all(
+      week.map((dateISO) =>
+        fetch(`/api/menu?date=${dateISO.replaceAll('-', '')}&category=${currentCategory}`)
+          .then((res) => res.json())
+          .catch(() => ({ error: true }))
+      )
+    );
+
+    // 간편식 브랜드 목록은 카테고리 기준으로 매일 동일하니, 성공한 응답 중 하나에서 가져와서 씀
+    const okResult = results.find((r) => r && !r.error && r.convenienceBrands);
+    const brandsForWeek = okResult ? okResult.convenienceBrands : currentConvenienceBrands;
+
+    weeklyArea.innerHTML = '';
+    week.forEach((dateISO, idx) => {
+      const data = results[idx];
+      const d = new Date(dateISO + 'T00:00:00');
+      const headerText = `${d.getMonth() + 1}/${d.getDate()} (${WEEKDAY_KO[d.getDay()]})`;
+      const isToday = dateISO === todayISO;
+
+      const card = document.createElement('div');
+      card.className = 'week-day-card';
+
+      if (!data || data.error || !data.meals) {
+        card.innerHTML = `<div class="week-day-header${isToday ? ' today' : ''}">${headerText}${isToday ? ' · 오늘' : ''}</div>
+          <div class="week-meal-row"><span class="week-meal-items">등록된 메뉴가 없어요</span></div>`;
+      } else {
+        const meals = data.meals.filter((meal) => !EXCLUDED_MEALTIMES.some((ex) => (meal.mealTime || '').includes(ex)));
+        const rowsHtml = meals
+          .map((meal) => {
+            // 간편식(브랜드) 항목은 주간보기에선 복잡해지니 빼고, 일반 메뉴 이름만 보여줌
+            const names = (meal.menus || [])
+              .filter((m) => !brandsForWeek.some((b) => (m.courseTxt || '').includes(b)))
+              .map((m) => pick(m, NAME_KEYS))
+              .filter(Boolean);
+            if (!names.length) return '';
+            return `<div class="week-meal-row"><span class="week-meal-label">${meal.mealTime}</span><span class="week-meal-items">${names.join(', ')}</span></div>`;
+          })
+          .join('');
+        card.innerHTML = `<div class="week-day-header${isToday ? ' today' : ''}">${headerText}${isToday ? ' · 오늘' : ''}</div>${rowsHtml || '<div class="week-meal-row"><span class="week-meal-items">등록된 메뉴가 없어요</span></div>'}`;
+      }
+
+      // 카드를 누르면 그 날짜의 하루 보기로 바로 이동
+      card.onclick = () => {
+        $('menuDateInput').value = dateISO;
+        setWeeklyView(false);
+      };
+      weeklyArea.appendChild(card);
+    });
+  } catch (e) {
+    weeklyArea.innerHTML = '<div id="weeklyStatus">한 주 식단을 불러오지 못했어요.</div>';
+  }
+}
 
 // 이미 설정된 게 있으면 바로 결과 화면으로
 const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
