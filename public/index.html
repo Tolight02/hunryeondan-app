@@ -460,6 +460,35 @@
   .menu-card .tap-hint { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 4px; }
   #menuStatus { text-align: center; color: var(--muted); padding: 24px; font-size: 14px; }
 
+  .loading-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 20px;
+    gap: 14px;
+  }
+  .loading-spinner {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 4px solid var(--accent-soft-2);
+    border-top-color: var(--accent);
+    animation: loading-spin 0.8s linear infinite;
+  }
+  @keyframes loading-spin { to { transform: rotate(360deg); } }
+  .loading-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .loading-tip {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.6;
+    max-width: 280px;
+  }
+
   .brand-heading {
     font-size: 13px;
     font-weight: 700;
@@ -480,6 +509,7 @@
   }
   .modal-overlay.open { display: flex; }
   .modal-sheet {
+    position: relative;
     background: var(--card);
     width: 100%;
     max-width: 480px;
@@ -487,7 +517,52 @@
     padding: 28px 22px 34px;
     max-height: 82vh;
     overflow-y: auto;
+    overflow-x: hidden;
   }
+  .confetti-wrap {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 140px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .confetti-piece {
+    position: absolute;
+    top: -30px;
+    font-size: 22px;
+    animation-name: confetti-fall;
+    animation-timing-function: ease-in;
+    animation-fill-mode: forwards;
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(160px) rotate(360deg); opacity: 0; }
+  }
+  .completion-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 800;
+    margin: 8px 0 6px;
+  }
+  .completion-sub {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 22px;
+  }
+  .completion-btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-top: 10px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .completion-btn.primary { background: var(--accent); color: #fff; }
+  .completion-btn.secondary { background: var(--accent-soft-2); color: var(--accent); }
   .modal-sheet img {
     width: 100%;
     max-height: 200px;
@@ -627,22 +702,22 @@
 
     <div class="faq-item">
       <div class="faq-q">Q. 공식 앱인가요?</div>
-      <div class="faq-a">아니요, 개인이 만든 비공식 앱이에요. 정확한 최신 정보는 삼성웰스토리 공식 앱(웰스토리플러스)에서 다시 확인해주세요.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-q">Q. 훈련병인데 왜 메뉴가 조교보다 적게 보이나요?</div>
-      <div class="faq-a">훈련병은 실제로 "한식"으로 분류된 메뉴만 먹기 때문에, 일품/간편식 메뉴는 일부러 안 보여드리고 있어요. 실제로 못 먹는 메뉴가 보이면 오히려 헷갈릴 수 있으니까요.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-q">Q. 로카프랩 메뉴가 자세히 안 보여요.</div>
-      <div class="faq-a">로카프랩은 예약 전용 시스템이라, 이 앱이 가져오는 일반 메뉴 정보에는 자세한 내용이 없어요. 간편식 칸에서 "로카프랩"을 누르면 삼성웰스토리 앱에서 확인해달라는 안내가 떠요.</div>
+      <div class="faq-a">개인이 만든 비공식 앱이에요.</div>
     </div>
 
     <div class="faq-item">
       <div class="faq-q">Q. 실제 식단이랑 달라요.</div>
-      <div class="faq-a">현장 사정으로 메뉴가 바뀌는 경우가 있어요. 이 앱은 참고용으로만 사용해주세요.</div>
+      <div class="faq-a">현장 사정으로 메뉴가 바뀌는 경우가 있어요. 이 앱은 참고용으로만 써주세요.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 진주 말고 다른 지역도 지원해주세요</div>
+      <div class="faq-a">공군본부 문의 결과 공군 부대별 식단 데이터는 제공하지 않아서, 당분간은 진주에 있는 장병들의 식단만 확인이 가능해요.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Q. 로카프랩 메뉴가 자세히 안 보여요.</div>
+      <div class="faq-a">로카프랩은 예약 전용 시스템이라, 이 앱에서 가져오는 일반 메뉴 정보에는 자세한 내용이 없어요.</div>
     </div>
 
     <div class="faq-item">
@@ -656,7 +731,7 @@
 
 <div class="modal-overlay" id="licenseModal">
   <div class="modal-sheet">
-    <h3>라이선스 &amp; 도움 주신 분들</h3>
+    <h3>라이선스</h3>
     <div class="nutri-row"><span class="k">식단 정보</span><span class="v">삼성웰스토리</span></div>
     <div class="nutri-row"><span class="k">어플 로고</span><span class="v"><a href="https://afplay2.tistory.com/74" target="_blank" rel="noopener">afplay2.tistory.com</a></span></div>
     <div class="nutri-row"><span class="k">캐릭터 일러스트</span><span class="v"><a href="http://www.afzine.co.kr/20190719_162442/" target="_blank" rel="noopener">afzine.co.kr</a></span></div>
@@ -664,7 +739,7 @@
     <div class="brand-item-name" style="margin-top:20px;">도움 주신 분들</div>
     <div class="nutri-row"><span class="k">우유볶음</span><span class="v">공군 832기</span></div>
     <div class="nutri-row"><span class="k">행포</span><span class="v">공군 842기</span></div>
-    <div class="nutri-row"><span class="k">LWB</span><span class="v">공군 881기</span></div>
+    <div class="nutri-row"><span class="k">달리기좋아청년</span><span class="v">공군 881기</span></div>
     <div class="nutri-row" id="easterEggRow" style="cursor:pointer;">
       <span class="k">그리고 한 명 더...? 👀</span><span class="v">눌러보세요</span>
     </div>
@@ -674,6 +749,13 @@
     </div>
 
     <button class="modal-close" id="licenseClose">닫기</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="completionModal">
+  <div class="modal-sheet">
+    <div id="completionConfetti" class="confetti-wrap"></div>
+    <div id="completionContent"></div>
   </div>
 </div>
 
@@ -743,7 +825,7 @@
 
   <div class="menu-section">
     <h2>오늘 식단</h2>
-    <div class="date-row">
+    <div class="date-row" id="dailyDateRow">
       <button id="prevDayBtn" class="arrow-btn" aria-label="이전 날짜">‹</button>
       <button id="dateDisplayBtn" class="date-display" type="button">
         <span class="cal-icon">📅</span><span id="dateLabel">-</span>
@@ -751,6 +833,11 @@
       <input type="date" id="menuDateInput" />
       <button id="nextDayBtn" class="arrow-btn" aria-label="다음 날짜">›</button>
       <button id="todayBtn">오늘</button>
+    </div>
+    <div class="date-row" id="weekNavRow" style="display:none;">
+      <button id="prevWeekBtn" class="arrow-btn" aria-label="이전 주">‹</button>
+      <div class="date-display" id="weekLabel">-</div>
+      <button id="nextWeekBtn" class="arrow-btn" aria-label="다음 주">›</button>
     </div>
     <button id="weeklyToggleBtn" class="weekly-toggle-btn" type="button">📆 이번 주 식단 보기</button>
     <div id="mealTabs" class="tabs meal-tabs" style="display:none;"></div>
@@ -775,6 +862,8 @@
 <script>
 const $ = (id) => document.getElementById(id);
 const STORAGE_KEY = 'hunryeondan_setting';
+const COMPLETION_SHOWN_KEY = 'hunryeondan_completion_shown';
+let isCompletedTrainee = false;
 
 // toISOString()은 UTC 기준이라 한국(UTC+9)에서는 자정 근처에 날짜가 하루 밀리는 버그가 생김.
 // 항상 "로컬 기준" 날짜 문자열을 만들어주는 안전한 헬퍼.
@@ -913,6 +1002,7 @@ async function showResult(setting) {
 
   const showDday = setting.category === 'trainee' && !setting.unknown;
   $('miniDday').style.display = showDday ? 'block' : 'none';
+  isCompletedTrainee = false;
 
   if (showDday) {
     const query = setting.gigsu ? `gigsu=${setting.gigsu}` : `enlistDate=${setting.enlistDate}`;
@@ -929,6 +1019,15 @@ async function showResult(setting) {
       $('estimateNote').textContent = data.source === 'estimate'
         ? `입소일(${data.enlistDate}) 기준 약 5주 후로 추정한 수료일(${data.completionDate})이에요. 정확한 날짜가 확인되면 더 정확해져요.`
         : `입소일 ${data.enlistDate} · 수료일 ${data.completionDate}`;
+
+      if (data.daysLeft === 0) {
+        isCompletedTrainee = true;
+        // 처음 100%가 됐을 때 딱 한 번 자동으로 축하 화면을 띄움 (그 이후엔 D-day 바를 눌러서 다시 볼 수 있음)
+        if (!localStorage.getItem(COMPLETION_SHOWN_KEY)) {
+          localStorage.setItem(COMPLETION_SHOWN_KEY, '1');
+          openCompletionModal();
+        }
+      }
     }
   }
 
@@ -1332,10 +1431,75 @@ function openNutriModal(m, name, image) {
   openModal('nutriModal');
 }
 
+// ---------- 수료 축하 모달 (100% 도달 시) ----------
+function confettiHtml() {
+  const emojis = ['🎉', '🎊', '🥳', '⭐', '🎖️'];
+  let html = '';
+  for (let i = 0; i < 24; i++) {
+    const left = Math.random() * 100;
+    const delay = (Math.random() * 0.6).toFixed(2);
+    const duration = (1.8 + Math.random() * 1.2).toFixed(2);
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+    html += `<span class="confetti-piece" style="left:${left}%;animation-delay:${delay}s;animation-duration:${duration}s;">${emoji}</span>`;
+  }
+  return html;
+}
+
+function selectNewCategoryAfterCompletion(category) {
+  const setting = { category, gigsu: null, enlistDate: null, unknown: true };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(setting));
+  closeModal('completionModal');
+  showResult(setting);
+}
+
+function renderCompletionStep1() {
+  $('completionConfetti').innerHTML = confettiHtml();
+  $('completionContent').innerHTML = `
+    <div class="completion-title">🎖️ 수료를 축하합니다!</div>
+    <div class="completion-sub">이제 어디로 배치되셨나요?</div>
+    <button class="completion-btn primary" id="completionSpecialtyBtn">특기학교 입학</button>
+    <button class="completion-btn secondary" id="completionUnitBtn">자대 배치</button>
+    <a href="#" class="back-link" id="completionDismissLink" style="margin-top:16px;">계속 훈련병 식단 보기</a>
+  `;
+  $('completionSpecialtyBtn').onclick = () => selectNewCategoryAfterCompletion('specialty');
+  $('completionUnitBtn').onclick = () => renderCompletionStep2();
+  $('completionDismissLink').onclick = (e) => { e.preventDefault(); closeModal('completionModal'); };
+}
+
+function renderCompletionStep2() {
+  $('completionContent').innerHTML = `
+    <div class="completion-title">자대가 진주에 있나요?</div>
+    <button class="completion-btn primary" id="completionJinjuYesBtn">네, 진주예요</button>
+    <button class="completion-btn secondary" id="completionJinjuNoBtn">아니요</button>
+  `;
+  $('completionJinjuYesBtn').onclick = () => selectNewCategoryAfterCompletion('specialty');
+  $('completionJinjuNoBtn').onclick = () => renderCompletionStep3();
+}
+
+function renderCompletionStep3() {
+  $('completionContent').innerHTML = `
+    <div class="completion-title">앗, 아직은...</div>
+    <div class="completion-sub">이 앱은 진주 소속 장병들의 식단만 제공하기 때문에, 앞으로의 식단은 여기서 볼 수 없어요.</div>
+    <button class="completion-btn secondary" id="completionCloseBtn">닫기</button>
+  `;
+  $('completionCloseBtn').onclick = () => closeModal('completionModal');
+}
+
+function openCompletionModal() {
+  renderCompletionStep1();
+  openModal('completionModal');
+}
+
 $('nutriClose').onclick = () => closeModal('nutriModal');
 $('nutriModal').onclick = (e) => { if (e.target.id === 'nutriModal') closeModal('nutriModal'); };
 
-$('miniDday').onclick = () => $('estimateNote').classList.toggle('open');
+$('miniDday').onclick = () => {
+  if (isCompletedTrainee) {
+    openCompletionModal();
+  } else {
+    $('estimateNote').classList.toggle('open');
+  }
+};
 $('miniDday').style.cursor = 'pointer';
 
 // ---------- 우측 상단 메뉴 / 라이선스 ----------
@@ -1398,6 +1562,85 @@ function renderMealTab(mealName) {
   });
 }
 
+// 로딩 중에 랜덤으로 보여줄 공군 꿀팁 모음
+const AIRFORCE_TIPS = [
+  '공군 매점은 PX(Post Exchange)가 아니라\nBX(Base Exchange)입니다.',
+  "비행단은 '단', 전대는 '전대', 대대는 '대대' 단위로 부릅니다.",
+  '공군의 복무 기간은 21개월로,\n타 군보다 조금 더 깁니다.',
+  '공군은 비전투부대 성격이 강해서 풋살이나 축구하다가\n다치는 경우가 가장 많다는데... (확실하진 않아요)',
+  'O.R.E는 비행단 자체 전투태세훈련이며\nO.R.I는 상급 부대에서 평가하는 검열 훈련입니다.',
+  '공군 부대 마크는 팔이 아니라\n왼쪽 가슴 주머니나 명찰 위에 다는 경우가 많습니다.',
+  '공군은 40km 행군이나 유격 훈련이 없는 대신\n기지 방호 훈련 (ORE, ORI)가 있습니다.',
+  '6주마다 2박 3일(또는 3박 4일)의\n성과제 외박이 주어집니다.',
+  "성과제 외박에 정기휴가(연가)를 붙여 길게 나가는 것을\n'붙임 휴가'라고 합니다.",
+  "연가만 단독으로 쓰는 것을\n공군 은어로 '생연가'라고 부릅니다.",
+  '군사경찰이나 급양 등 크루(교대) 근무자는\n보통 외박이 3박 4일 주어집니다.',
+  '휴가 시 KTX나 고속버스를 무료로 탈 수 있는\nTMO 제도를 적극 활용하세요.',
+  '비행단은 터미널이나 기차역으로 가는 셔틀버스 등\n교통편이 잘 되어 있습니다.',
+  '위로휴가, 포상휴가를 모으면\n말년에 한 달 가까이 장기 휴가를 나갈 수도 있습니다.',
+  '평일 외출 제도를 활용해\n부대 근처 식당이나 카페에서 스트레스를 풀 수 있습니다.',
+  '최근에는 부대 내 태블릿 PC 반입 규정이 완화된 곳이 많아\n자기계발하기 좋습니다.',
+  '헌혈(전혈/성분헌혈)을 하면 가점이 쌓여\n포상휴가를 받을 수 있습니다.',
+  '자격증 취득 등 자기계발을 통해\n휴가 가점을 모으는 병사들이 많습니다.',
+  '주말 면회 시 부대 내 지정된 면회 공간에서\n배달 음식을 시켜 먹을 수 있습니다.',
+  '고정된 대형 취사 시설에서 밥을 지어\n타 군 대비 식단 퀄리티가 훌륭합니다.',
+  "주말 아침에는 늦잠을 자는 장병을 위해\n'브런치'가 제공되는 부대도 있습니다.",
+  '군대리아(빵식)가 나오는 날에는\n시리얼과 우유가 함께 제공됩니다.',
+  '훈련 기간에는 병영식당 대신\n전투식량이나 추진 배식으로 식사하기도 합니다.',
+  '병영식당 메뉴 중 꼬리곰탕이나 삼계탕이 나오는 날은\n병사들에게 인기가 최고입니다.',
+  'BX 인기 메뉴는 냉동 닭강정, 피자,\n그리고 불닭볶음면과 짜장라면의 조합입니다.',
+  '식사 집합 시 부서별, 계급별로\n줄을 서서 이동하는 문화가 남아있는 곳도 있습니다.',
+  '군용 초코파이나 참치마요 덮밥은\n군 생활의 소소한 행복을 책임지는 메뉴입니다.',
+  "'오늘 메뉴 뭐야?'는 병사들이\n하루 중 가장 많이 하는 질문 1위일 것입니다",
+  '입소 첫 주는 신체검사와 보급품을 받는 주차입니다.',
+  "생활관은 '호실' 단위로 나뉘며,\n호실장의 지휘 아래 점호가 이루어집니다.",
+  '화생방 훈련은 방독면을 착용하고\n가스실에서 정화통을 교체하는 등 실전처럼 진행됩니다.',
+  '사격 훈련장까지 이동 거리가 멀어\n행군 못지않은 체력이 필요합니다.',
+  '훈련소 주말엔 종교 행사에 가서\n초코파이 등 간식을 받는 재미가 큽니다.',
+  '입소 시 샴푸와 바디워시 기능이 합쳐진 올인원 워시를 챙기면\n씻는 시간을 단축할 수 있습니다.',
+  '여분의 안경, 파스, 보호대 등 개인 상비 물품은\n훈련소 생활의 질을 높여줍니다.',
+  '훈련소에서는 렌즈 착용이 금지되어 있으니\n여분의 안경을 꼭 챙겨야 합니다.',
+  '비가 올 때 우산을 쓸 수 있지만,\n검정이나 남색 같은 무채색 계열만 허용됩니다.',
+  '생활관마다 에어컨, 건조기 등\n편의 시설이 비교적 잘 갖춰져 있습니다.',
+  '체력 단련 시간에는 주로 연병장을 뛰거나\n부대 내 체육 시설을 이용합니다.',
+  '활주로가 있는 부대는 전투기 이착륙 소음이 엄청나서\n처음엔 깜짝 놀라게 됩니다.',
+  '활주로 제설은 주로 대형 장비가 하고,\n병사들은 생활관 주변 등을 치웁니다.',
+  '부대 내 도서관이나 독서실이 마련되어 있어\n수능이나 어학 공부를 하는 병사가 많습니다.',
+  '일병 막내 때는 잡일이 많지만,\n시스템에 적응하면 군 생활이 금방 편해집니다.',
+  '매일 아침 점호 시간엔\n국군도수체조와 구보(달리기)로 하루를 시작합니다.',
+  '부대마다 다르지만 영내에 치킨집, 피자집,\n심지어 프랜차이즈 카페가 있는 비행단도 많습니다.',
+  '정신 교육 시간은 졸음과의 싸움이지만,\n애국심과 안보관을 다지는 중요한 시간입니다.',
+  '과거와 달리 구타나 가혹행위가 거의 사라져\n비교적 평온하게 생활할 수 있습니다.',
+  "공군 정복인 '약복'은 네이비 블루 계열로,\n입으면 단정하지만 안감이 조금 까칠한 편입니다.",
+  "약복 착용 시 쓰는 '개리슨모'는 호불호가 갈리지만\n공군만의 특색 있는 모자입니다.",
+  '두발 규정은 앞머리 5cm, 윗머리 3cm 이내로,\n단정한 스포츠머리 정도면 허용됩니다.',
+  "겨울철 공군 방한복인 '스키파카'는\n보온성이 아주 뛰어나 군대 내 꿀템으로 불립니다.",
+  '전투복은 육군과 같은 화강암 패턴을 쓰지만,\n가슴에 다는 명찰은 파란색입니다.',
+  '부대 내에서는 사복 착용이 금지되며,\n일과 후에는 지정된 활동복(체육복)을 입습니다.',
+  '활동복(체육복) 색상이나 디자인은\n기수에 따라 조금씩 리뉴얼되기도 합니다.',
+  '이름표(명찰)는 벨크로(찍찍이)로 되어 있어\n옷을 세탁할 때 쉽게 뗄 수 있습니다.',
+  '휴가 시 전투복 출타와 약복 출타 중 하나를 선택할 수 있으나\n부대 규정에 따라 다릅니다.',
+  '여름철 하계 전투복은 얇고 통풍이 잘되지만\n땀이 나면 자주 세탁해야 합니다.',
+  '편지를 쓸 때는 유성펜을 사용하면\n잉크가 번지지 않아 훨씬 깔끔하게 보관할 수 있습니다.',
+  '장병내일준비적금은 최대 이율을 위해\n월급날 바로 자동이체를 걸어두는 것도 좋습니다.',
+  '주말엔 푹 쉬거나 밀린 빨래를 하며\n다음 주를 준비하는 것이 일상입니다.',
+  '선임이나 동기들과 원만한 관계를 유지하며\n돕고 지내는 것이 군 생활 최고의 꿀팁입니다.',
+  "너무 튀지도, 너무 뒤처지지도 않게\n'중간만 가자'는 마인드가 군대 국룰 중 하나입니다.",
+  '전역일 계산기를 너무 자주 보지 마세요.\n국방부 시계는 늦어도 결국 돌아갑니다.',
+];
+
+function loadingHtml(label) {
+  const tip = AIRFORCE_TIPS[Math.floor(Math.random() * AIRFORCE_TIPS.length)];
+  const tipHtml = tip.split('\n').map((line, i) => `<div>${i === 0 ? '💡 ' : ''}${line}</div>`).join('');
+  return `
+    <div class="loading-wrap">
+      <div class="loading-spinner"></div>
+      <div class="loading-label">${label || '불러오는 중'}</div>
+      <div class="loading-tip">${tipHtml}</div>
+    </div>
+  `;
+}
+
 async function loadMenu(dateISO) {
   const menuArea = $('menuArea');
   const menuStatus = $('menuStatus');
@@ -1406,7 +1649,7 @@ async function loadMenu(dateISO) {
   menuArea.innerHTML = '';
   convenienceArea.innerHTML = '';
   mealTabs.style.display = 'none';
-  menuStatus.textContent = '불러오는 중...';
+  menuStatus.innerHTML = loadingHtml();
   updateDateLabel(dateISO);
   try {
     const dateParam = (dateISO || toLocalISODate(new Date())).replaceAll('-', '');
@@ -1505,14 +1748,10 @@ $('nextDayBtn').onclick = () => shiftDate(1);
 
 // ---------- 주간보기 ----------
 let weeklyViewOn = false;
+let currentWeekMonday = null; // 지금 보고 있는 주의 월요일 (ISO)
 
-function getWeekRange(dateISO) {
-  // dateISO가 속한 주(월~일)의 날짜 7개를 반환
-  const d = new Date((dateISO || toLocalISODate(new Date())) + 'T00:00:00');
-  const day = d.getDay(); // 0=일 ... 6=토
-  const mondayOffset = day === 0 ? -6 : 1 - day; // 이번 주 월요일까지 얼마나 이동해야 하는지
-  const monday = new Date(d);
-  monday.setDate(d.getDate() + mondayOffset);
+function getWeekRange(mondayISO) {
+  const monday = new Date(mondayISO + 'T00:00:00');
   const week = [];
   for (let i = 0; i < 7; i++) {
     const day2 = new Date(monday);
@@ -1522,12 +1761,27 @@ function getWeekRange(dateISO) {
   return week;
 }
 
+function mondayOf(dateISO) {
+  const d = new Date((dateISO || toLocalISODate(new Date())) + 'T00:00:00');
+  const day = d.getDay(); // 0=일 ... 6=토
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + mondayOffset);
+  return toLocalISODate(d);
+}
+
+function weekOfMonthLabel(mondayISO) {
+  const monday = new Date(mondayISO + 'T00:00:00');
+  return `${monday.getMonth() + 1}월 ${Math.ceil(monday.getDate() / 7)}주차`;
+}
+
 function setWeeklyView(on) {
   weeklyViewOn = on;
   const btn = $('weeklyToggleBtn');
   btn.classList.toggle('active', on);
   btn.textContent = on ? '📅 하루씩 보기' : '📆 이번 주 식단 보기';
 
+  $('dailyDateRow').style.display = on ? 'none' : 'flex';
+  $('weekNavRow').style.display = on ? 'flex' : 'none';
   $('mealTabs').style.display = on ? 'none' : $('mealTabs').style.display;
   $('menuArea').style.display = on ? 'none' : 'block';
   $('menuStatus').style.display = on ? 'none' : 'block';
@@ -1535,6 +1789,7 @@ function setWeeklyView(on) {
   $('weeklyArea').style.display = on ? 'block' : 'none';
 
   if (on) {
+    currentWeekMonday = mondayOf($('menuDateInput').value || toLocalISODate(new Date()));
     loadWeeklyMenu();
   } else {
     loadMenu($('menuDateInput').value || toLocalISODate(new Date()));
@@ -1543,12 +1798,21 @@ function setWeeklyView(on) {
 
 $('weeklyToggleBtn').onclick = () => setWeeklyView(!weeklyViewOn);
 
+function shiftWeek(offsetWeeks) {
+  const d = new Date(currentWeekMonday + 'T00:00:00');
+  d.setDate(d.getDate() + offsetWeeks * 7);
+  currentWeekMonday = toLocalISODate(d);
+  loadWeeklyMenu();
+}
+$('prevWeekBtn').onclick = () => shiftWeek(-1);
+$('nextWeekBtn').onclick = () => shiftWeek(1);
+
 async function loadWeeklyMenu() {
   const weeklyArea = $('weeklyArea');
-  weeklyArea.innerHTML = '<div id="weeklyStatus">한 주 식단을 불러오는 중...</div>';
+  $('weekLabel').textContent = weekOfMonthLabel(currentWeekMonday);
+  weeklyArea.innerHTML = loadingHtml('한 주 식단 불러오는 중');
 
-  const baseDate = $('menuDateInput').value || toLocalISODate(new Date());
-  const week = getWeekRange(baseDate);
+  const week = getWeekRange(currentWeekMonday);
   const todayISO = toLocalISODate(new Date());
 
   try {
@@ -1586,8 +1850,10 @@ async function loadWeeklyMenu() {
               .filter((m) => !brandsForWeek.some((b) => (m.courseTxt || '').includes(b)))
               .map((m) => pick(m, NAME_KEYS))
               .filter(Boolean);
-            if (!names.length) return '';
-            return `<div class="week-meal-row"><span class="week-meal-label">${meal.mealTime}</span><span class="week-meal-items">${names.join(', ')}</span></div>`;
+            // 같은 대표메뉴 이름이 겹쳐서 나오는 경우가 있어서, 중복은 하나만 남김
+            const uniqueNames = [...new Set(names)];
+            if (!uniqueNames.length) return '';
+            return `<div class="week-meal-row"><span class="week-meal-label">${meal.mealTime}</span><span class="week-meal-items">${uniqueNames.join(' or ')}</span></div>`;
           })
           .join('');
         card.innerHTML = `<div class="week-day-header${isToday ? ' today' : ''}">${headerText}${isToday ? ' · 오늘' : ''}</div>${rowsHtml || '<div class="week-meal-row"><span class="week-meal-items">등록된 메뉴가 없어요</span></div>'}`;
