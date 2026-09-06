@@ -242,13 +242,13 @@
   .top-bar .weather-chip {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    padding: 6px 14px;
+    gap: 5px;
+    margin-top: 4px;
+    padding: 3px 11px;
     border-radius: 999px;
     background: var(--accent-soft-2);
     color: var(--accent);
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 800;
   }
   .top-bar .weather-chip:empty { display: none; }
@@ -305,18 +305,18 @@
   .estimate-note.open { display: block; }
 
   .menu-section h2 {
-    font-size: 19px;
+    font-size: 17px;
     font-weight: 800;
-    margin: 4px 0 14px;
+    margin: 2px 0 8px;
   }
   .date-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     background: var(--card);
     border-radius: var(--radius-md);
-    padding: 10px;
-    margin-bottom: 20px;
+    padding: 7px;
+    margin-bottom: 10px;
     box-shadow: var(--shadow);
   }
   .date-row input[type="date"] {
@@ -331,48 +331,56 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-size: 16px;
+    gap: 6px;
+    font-size: 14.5px;
     font-weight: 700;
-    padding: 12px 8px;
+    padding: 9px 6px;
     border: none;
     border-radius: var(--radius-sm);
     background: var(--bg);
     color: var(--text);
   }
-  .date-row .date-display .cal-icon { font-size: 17px; }
+  .date-row .date-display .cal-icon { font-size: 15px; }
   .date-row button {
-    padding: 10px 14px;
+    padding: 8px 12px;
     border: none;
     border-radius: var(--radius-sm);
     background: var(--accent-soft-2);
     color: var(--accent);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     white-space: nowrap;
-    min-height: 44px;
+    min-height: 38px;
   }
   .date-row .arrow-btn {
-    padding: 10px 16px;
-    font-size: 19px;
+    padding: 8px 14px;
+    font-size: 17px;
     font-weight: 700;
     line-height: 1;
   }
   .weekly-toggle-btn {
     display: block;
     width: 100%;
-    padding: 12px;
-    margin-bottom: 16px;
+    padding: 9px;
+    margin-bottom: 10px;
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     background: var(--accent-soft-2);
     color: var(--accent);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 12.5px;
   }
   .weekly-toggle-btn.active {
     background: var(--accent);
     color: #fff;
+  }
+  #mealTabs.tabs {
+    padding: 4px;
+    margin-bottom: 10px;
+  }
+  #mealTabs.tabs button {
+    padding: 9px 6px;
+    font-size: 13px;
   }
   .week-day-card {
     background: var(--card);
@@ -459,6 +467,33 @@
   }
   .menu-card .tap-hint { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 4px; }
   #menuStatus { text-align: center; color: var(--muted); padding: 24px; font-size: 14px; }
+
+  /* 메뉴가 2개 이상이면 카드를 양옆(2열)으로 배치 */
+  #menuArea.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  #menuArea.two-col .menu-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 12px;
+    margin-bottom: 0;
+  }
+  #menuArea.two-col .menu-card .kcal-badge {
+    position: static;
+    align-self: flex-end;
+    margin-bottom: 6px;
+  }
+  #menuArea.two-col .menu-card .thumb {
+    width: 100%;
+    height: 72px;
+    margin-bottom: 6px;
+  }
+  #menuArea.two-col .menu-card .info { padding-right: 0; }
+  #menuArea.two-col .menu-card .name { font-size: 14px; }
+  #menuArea.two-col .menu-card .detail-list { font-size: 11.5px; }
+  #menuArea.two-col .menu-card .tap-hint { font-size: 10px; }
 
   .loading-wrap {
     display: flex;
@@ -1552,9 +1587,11 @@ function renderMealTab(mealName) {
   menuArea.innerHTML = '';
   const items = currentMealsData[mealName] || [];
   if (!items.length) {
+    menuArea.classList.remove('two-col');
     menuArea.innerHTML = '<div id="menuStatus2" style="text-align:center;color:var(--muted);padding:24px;font-size:14px;">이 끼니엔 등록된 메뉴가 없어요.</div>';
     return;
   }
+  menuArea.classList.toggle('two-col', items.length >= 2);
   items.forEach((m) => menuArea.appendChild(buildMenuCard(m)));
 
   document.querySelectorAll('#mealTabs button').forEach((btn) => {
