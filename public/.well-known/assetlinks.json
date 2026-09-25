@@ -4,7 +4,12 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.onrender.hunryeondan_app.twa",
-      "sha256_cert_fingerprints": ["65:87:51:DC:EB:7B:2B:98:F7:89:7D:DB:FF:AE:B0:27:0D:44:A5:F2:34:B6:B8:FD:01:F7:8D:AE:2A:F0:4C:7E"]
+      "sha256_cert_fingerprints": [
+        "65:87:51:DC:EB:7B:2B:98:F7:89:7D:DB:FF:AE:B0:27:0D:44:A5:F2:34:B6:B8:FD:01:F7:8D:AE:2A:F0:4C:7E",
+        "5D:E8:E7:EB:95:E0:EA:9B:B3:51:53:57:EC:F5:B3:88:F7:AA:16:25:27:07:4B:E1:56:44:BA:CA:FF:72:51:63",
+        "D7:2B:17:88:00:6F:7E:D1:93:C3:BA:7C:DC:4E:CE:A3:7D:DE:47:19:61:53:3E:0C:71:A9:E0:FB:CC:73:E8:75",
+        "CE:CC:C8:F0:57:30:DB:AB:D7:20:29:FD:78:B6:5A:66:8E:5C:1D:C8:63:63:79:EB:C5:66:5B:E6:6B:DD:D0:A2"
+      ]
     }
   }
 ]

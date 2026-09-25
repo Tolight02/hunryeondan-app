@@ -8,8 +8,10 @@
 <link rel="icon" href="/assets/icon-app.png" type="image/png" />
 <link rel="apple-touch-icon" href="/assets/icon-app.png" />
 <meta name="theme-color" content="#b5651d" />
+<meta name="color-scheme" content="light only" />
 <style>
   :root {
+    color-scheme: light only;
     --bg: #faf8f4;
     --card: #ffffff;
     --line: #ece6da;
@@ -230,6 +232,10 @@
   }
 
   .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     text-align: center;
     margin-bottom: 2px;
     padding-top: 4px;
@@ -243,7 +249,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    margin-top: 4px;
+    margin-top: 0;
     padding: 3px 11px;
     border-radius: 999px;
     background: var(--accent-soft-2);
@@ -1547,7 +1553,7 @@ document.addEventListener('click', () => $('topMenuDropdown').classList.remove('
 $('bugReportBtn').onclick = () => {
   $('topMenuDropdown').classList.remove('open');
   if (confirm('카카오톡 오픈채팅으로 연결됩니다. 계속할까요?')) {
-    window.open('https://open.kakao.com/me/hyangmeong', '_blank', 'noopener');
+    window.open('https://open.kakao.com/o/sZLo91Ph', '_blank', 'noopener');
   }
 };
 
@@ -1930,19 +1936,28 @@ fetch('/api/visit', {
   body: JSON.stringify({ visitorId }),
 }).catch(() => {});
 
-// 진주(공군교육사령부) 실시간 날씨
-fetch('/api/weather')
-  .then((res) => res.json())
-  .then((data) => {
-    if (data && data.temp !== undefined && data.temp !== null) {
-      $('weatherChip').textContent = `${data.emoji} 진주 ${Math.round(data.temp)}°C`;
-    } else {
-      $('weatherChip').textContent = '날씨 정보를 불러오지 못했어요';
-    }
-  })
-  .catch(() => {
-    $('weatherChip').textContent = '날씨 정보를 불러오지 못했어요';
-  });
+// 진주(공군교육사령부) 실시간 날씨 (실패하면 한 번 더 재시도)
+function loadWeatherChip(isRetry) {
+  fetch('/api/weather')
+    .then((res) => res.json())
+    .then((data) => {
+      if (data && data.temp !== undefined && data.temp !== null) {
+        $('weatherChip').textContent = `${data.emoji} 진주 ${Math.round(data.temp)}°C`;
+      } else if (!isRetry) {
+        setTimeout(() => loadWeatherChip(true), 2000);
+      } else {
+        $('weatherChip').textContent = '';
+      }
+    })
+    .catch(() => {
+      if (!isRetry) {
+        setTimeout(() => loadWeatherChip(true), 2000);
+      } else {
+        $('weatherChip').textContent = '';
+      }
+    });
+}
+loadWeatherChip(false);
 </script>
 </body>
 </html>

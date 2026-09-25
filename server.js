@@ -32,23 +32,36 @@ let weatherCachedAt = 0;
 const WEATHER_TTL_MS = 1000 * 60 * 10; // 10분 캐시 (너무 자주 호출 안 하려고)
 
 app.get('/api/weather', async (req, res) => {
-  try {
-    const now = Date.now();
-    if (weatherCache && now - weatherCachedAt < WEATHER_TTL_MS) {
+  const now = Date.now();
+  if (weatherCache && now - weatherCachedAt < WEATHER_TTL_MS) {
+    return res.json(weatherCache);
+  }
+
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${JINJU_LAT}&longitude=${JINJU_LON}&current=temperature_2m,weather_code&timezone=Asia%2FSeoul`;
+
+  // 네트워크가 잠깐 불안정할 수 있어서, 짧은 타임아웃을 걸고 최대 2번까지 시도
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
+      const r = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+      const data = await r.json();
+      const temp = data?.current?.temperature_2m;
+      const code = data?.current?.weather_code;
+      if (temp === undefined || temp === null) throw new Error('응답에 temperature_2m 없음');
+      const [emoji, label] = weatherCodeToInfo(code);
+      weatherCache = { temp, emoji, label };
+      weatherCachedAt = now;
       return res.json(weatherCache);
+    } catch (e) {
+      console.error(`[weather] 시도 ${attempt} 실패:`, e.message);
+      if (attempt === 2) {
+        // 새로 못 가져왔어도, 예전에 성공했던 값이 있으면 그거라도 보여줌 (완전히 오류 뜨는 것보단 나음)
+        if (weatherCache) return res.json(weatherCache);
+        return res.status(500).json({ error: '날씨 정보를 못 가져왔어요.' });
+      }
     }
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${JINJU_LAT}&longitude=${JINJU_LON}&current=temperature_2m,weather_code&timezone=Asia%2FSeoul`;
-    const r = await fetch(url);
-    const data = await r.json();
-    const temp = data?.current?.temperature_2m;
-    const code = data?.current?.weather_code;
-    const [emoji, label] = weatherCodeToInfo(code);
-    weatherCache = { temp, emoji, label };
-    weatherCachedAt = now;
-    res.json(weatherCache);
-  } catch (e) {
-    console.error('[weather] 에러:', e.message);
-    res.status(500).json({ error: '날씨 정보를 못 가져왔어요.' });
   }
 });
 
